@@ -1,59 +1,157 @@
-import companyHandler from "@/utils/companyHandler";
-import {Form} from "@inertiajs/react";
-import { useState, useEffect } from "react";
-import {Combobox, ComboboxInput, ComboboxOption} from "@headlessui/react";
+import companyHandler from '@/utils/companyHandler';
+import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Label } from '@headlessui/react';
+import { useEffect, useState } from 'react';
 
 type Company = {
-    siren: string,
-    nom_complet: string,
-    nom_raison_sociale: string,
-    siege:{
-        adresse:string
+    siren: string;
+    nom_complet: string;
+    nom_raison_sociale: string;
+    siege: {
+        commune: string;
     };
-}
+};
 
-export default function CompanySearchInput(){
-    const [companyQuery, setCompanyQuery] = useState<string>("");
+
+type FieldName = 'company.siren';
+
+type CompanySearchInputProps = {
+    onCompanySelect: (company: Company) => void;
+    onBlurEffect: (fieldName: FieldName, value: any) => void;
+    error?: string;
+};
+
+export default function CompanySearchInput({ onCompanySelect, error, onBlurEffect }: CompanySearchInputProps) {
+    const [companyQuery, setCompanyQuery] = useState<string>('');
     const [companyData, setCompanyData] = useState<Company[]>([]);
-    const [selectedCompany, setSelectedCompany] = useState<Company>();
+    const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+    const [apiError, setApiError] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    useEffect(()=>{
-        if(!companyQuery.trim() || companyQuery.trim().length <3) return;
-        const interval = setTimeout(async ()=>{
-            const reqApi = await companyHandler.getCompanyByText(companyQuery.trim());
-            if(reqApi.data){
-                setCompanyData(reqApi.data.results);
-            }
-        }, 800)
-
-        return ()=>{
-            clearTimeout(interval);
+    useEffect(() => {
+        if (!companyQuery.trim() || companyQuery.trim().length < 3) {
             setCompanyData([]);
+            setApiError('');
+            setIsLoading(false);
+            return;
+        }
+
+        const abortController = new AbortController();
+
+        const interval = setTimeout(async () => {
+            setIsLoading(true);
+            setApiError('');
+
+            try {
+                const reqApi = await companyHandler.getCompanyByText(companyQuery.trim(), abortController.signal);
+
+                if (reqApi.data && reqApi.data.results) {
+                    setCompanyData(reqApi.data.results);
+
+                    if (reqApi.data.results.length === 0) {
+                        setApiError('Aucune entreprise trouvée');
+                    }
+                } else {
+                    setApiError('Erreur lors de la recherche');
+                }
+            } catch (error: any) {
+                if (error.name !== 'AbortError') {
+                    setApiError("Erreur de connexion à l'API");
+                    console.error('Erreur API:', error);
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        }, 800);
+
+        return () => {
+            clearTimeout(interval);
+            abortController.abort();
         };
     }, [companyQuery]);
-    
+
     return (
-        <div>
-            
-            <div className="flex flex-col" id="companies">
-                <Combobox value={selectedCompany} onChange={(c:Company)=>{
+        <Field className="w-full" id="companies">
+            <Label className="mb-2 block text-sm font-medium text-gray-700">
+                Nom de l'entreprise / SIREN <span className="text-red-500">*</span>
+            </Label>
+            <Combobox
+                value={selectedCompany}
+                onChange={(c: Company | null) => {
                     setSelectedCompany(c);
                     setCompanyData([]);
+                    setApiError('');
 
-                }}>
-                    <ComboboxInput displayValue={(c:Company | null)=>`${c?.nom_complet||""}(${c?.siren || ""})`}
-                     className="border-2 border-red-600 w-xs" onChange={(e)=>setCompanyQuery(e.target.value)} />
-                    <div className="bg-gray-400 inline-block w-xs">
-                        {companyData.map((c:Company)=>(
-                            <ComboboxOption className="border-2 border-black my-4" key={c.siren} value={c}>
-                                <div className="siren_company text-xs">Siren : {c.siren}</div>
-                                <div className="name_company">Nom : {c.nom_complet}</div>
-                                <div className="address_company">Adresse : {c.siege.adresse}</div>
-                            </ComboboxOption>
-                        ))}
-                    </div>
-                </Combobox>
-            </div>
-        </div>
-    )
+                    if (c) {
+                        onCompanySelect(c);
+                    }
+                }}
+            >
+                <div className="relative">
+                    <ComboboxInput
+                        displayValue={(c: Company | null) => (c ? `${c.nom_complet} (${c.siren})` : '')}
+                        className={`w-full rounded-md border px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 ${
+                            error ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        onChange={(e) => {
+                            setCompanyQuery(e.target.value);
+                            setSelectedCompany(null);
+                        }}
+                        onBlur={() => {
+                            if (selectedCompany) {
+                                onBlurEffect('company.siren', selectedCompany.siren);
+                            } else {
+                                onBlurEffect('company.siren', '');
+                            }
+                        }}
+                        placeholder="Recherchez une entreprise par nom ou SIREN (min. 3 caractères)"
+                        aria-invalid={error ? 'true' : 'false'}
+                        aria-describedby={error ? 'company-error' : undefined}
+                    />
+
+                    {isLoading && (
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <svg className="h-5 w-5 animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                        </div>
+                    )}
+
+                    {(companyData.length > 0 || (apiError && companyQuery.length >= 3)) && (
+                        <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-300 bg-white py-1 shadow-lg focus:outline-none">
+                            {companyData.length > 0 ? (
+                                companyData.map((c: Company) => (
+                                    <ComboboxOption
+                                        className={({ focus }) =>
+                                            `${focus ? 'bg-blue-50' : 'bg-white even:bg-gray-50'} relative cursor-pointer select-none px-4 py-3 transition-colors hover:bg-blue-100`
+                                        }
+                                        key={c.siren}
+                                        value={c}
+                                    >
+                                        <div>
+                                            <div className="mb-1 font-semibold text-gray-900">{c.nom_complet}</div>
+                                            <div className="text-xs text-gray-600">
+                                                <span className="font-medium">SIREN :</span> {c.siren}
+                                            </div>
+                                            <div className="text-xs text-gray-600">
+                                                <span className="font-medium">Ville :</span> {c.siege.commune || 'Inconnue'}
+                                            </div>
+                                        </div>
+                                    </ComboboxOption>
+                                ))
+                            ) : (
+                                !isLoading && <div className="px-4 py-3 text-center text-sm text-gray-500">{apiError}</div>
+                            )}
+                        </ComboboxOptions>
+                    )}
+                </div>
+            </Combobox>
+
+            <p className="mt-1 text-xs text-gray-500">Tapez au moins 3 caractères pour lancer la recherche</p>
+        </Field>
+    );
 }
