@@ -1,20 +1,20 @@
-const HOST = "https://recherche-entreprises.api.gouv.fr";
-
 const companyHandler = {
-    getCompanyByText: async (text: String)=>{
-        try{
-            const reqApi = await fetch(`${HOST}/search?q=${text}`);
-            if(!reqApi.ok){
-                throw new Error(`Error ${reqApi.status}`);
+    getCompanyByText: async (query: string, signal?: AbortSignal) => {
+        try {
+            const response = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(query)}`, {
+                signal,
+            });
+            
+            if (!response.ok) {
+                throw new Error('Erreur API');
             }
-            const resApi = await reqApi.json();
-            return {data: resApi};
-        } catch(e){
-            console.error(e);
-            return {error: `Erreur ${e}`};
+            
+            const data = await response.json();
+            return { data };
+        } catch (error) {
+            throw error;
         }
     }
-
 };
 
 export default companyHandler;
