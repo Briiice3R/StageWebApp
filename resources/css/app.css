@@ -7,3 +7,12 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+
+
+/* Empêche Headless UI de bloquer le scroll */
+html:has([data-headlessui-state~="open"]),
+body:has([data-headlessui-state~="open"]) {
+    overflow: auto !important;
+    padding-right: 0 !important; /* Empêche l'ajout de padding à droite */
+}
