@@ -1,46 +1,67 @@
 import CompanySearchInput from '@/components/CompanySearchInput';
+import StudentSearchInput from '@/components/StudentSearchInput';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
+import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Label } from '@headlessui/react';
+
 
 type FieldName =
     | 'company.siren'
-    | 'company.name'
     | 'internship.startDate'
     | 'internship.endDate'
     | 'internship.subject'
     | 'internship.studentTask'
     | 'internship.comment'
-    | 'internship.student'
     | 'internship.teacher'
     | 'internship.isRemote'
-    | 'supervisor.name'
+    | 'supervisor.first_name'
+    | 'supervisor.last_name'
     | 'supervisor.mail'
-    | 'supervisor.phone';
+    | 'supervisor.phone'
+    | "student.student_id";
+
+type Student = {
+    "student_id": string;
+    "first_name": string;
+    "last_name": string;
+}
 
 export default function CreateInternship() {
     const [frontErrors, setFrontErrors] = useState<Partial<Record<FieldName, string>>>({});
     const [hasTouched, setHasTouched] = useState<Partial<Record<FieldName, boolean>>>({});
-    const { data, setData, post, processing, errors, reset } = useForm({
+
+    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+    const [studentQuery, setStudentQuery] = useState<string>("");
+    const [studentData, setStudentData] = useState<Student[]>([]);
+    const [apiError, setApiError] = useState<string>('');
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const { data, setData, post, processing, errors, reset, transform } = useForm({
         internship: {
             startDate: '',
             endDate: '',
             subject: '',
             studentTask: '',
             comment: '',
-            student: '',
             teacher: '',
             isRemote: '',
         },
+        student:{
+            student_id: '',
+        },
         company: {
             siren: '',
-            name: '',
         },
         supervisor: {
-            name: '',
+            first_name: '',
+            last_name: '',
             mail: '',
             phone: '',
         },
     });
+
+    
 
     const getError = (fieldName: FieldName) => {
         return frontErrors[fieldName] || errors[fieldName as keyof typeof errors];
@@ -93,15 +114,18 @@ export default function CreateInternship() {
                 if (value.length < 20) return 'Veuillez décrire les tâches plus en détail (min. 20 caractères).';
                 break;
 
-            case 'internship.student':
-                if (!value) return "Le nom de l'étudiant est requis.";
+            case 'student.student_id':
+                if (!value) return "Vous devez sélectionner un étudiant.";
                 break;
 
             case 'internship.teacher':
                 if (!value) return 'Le nom du maître de stage est requis.';
                 break;
 
-            case 'supervisor.name':
+            case 'supervisor.first_name':
+                if (!value) return 'Le prénom du tuteur est requis.';
+                break;
+            case 'supervisor.last_name':
                 if (!value) return 'Le nom du tuteur est requis.';
                 break;
 
@@ -122,7 +146,6 @@ export default function CreateInternship() {
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-
         const validationErrors: Partial<Record<FieldName, string>> = {};
 
         validationErrors['company.siren'] = validationFields('company.siren', data.company.siren) || undefined;
@@ -131,9 +154,10 @@ export default function CreateInternship() {
         validationErrors['internship.isRemote'] = validationFields('internship.isRemote', data.internship.isRemote) || undefined;
         validationErrors['internship.subject'] = validationFields('internship.subject', data.internship.subject) || undefined;
         validationErrors['internship.studentTask'] = validationFields('internship.studentTask', data.internship.studentTask) || undefined;
-        validationErrors['internship.student'] = validationFields('internship.student', data.internship.student) || undefined;
         validationErrors['internship.teacher'] = validationFields('internship.teacher', data.internship.teacher) || undefined;
-        validationErrors['supervisor.name'] = validationFields('supervisor.name', data.supervisor.name) || undefined;
+        validationErrors['student.student_id'] = validationFields('student.student_id', data.student.student_id) || undefined;
+        validationErrors['supervisor.first_name'] = validationFields('supervisor.first_name', data.supervisor.first_name) || undefined;
+        validationErrors['supervisor.last_name'] = validationFields('supervisor.last_name', data.supervisor.last_name) || undefined;
         validationErrors['supervisor.mail'] = validationFields('supervisor.mail', data.supervisor.mail) || undefined;
         validationErrors['supervisor.phone'] = validationFields('supervisor.phone', data.supervisor.phone) || undefined;
 
@@ -151,9 +175,10 @@ export default function CreateInternship() {
                 'internship.isRemote': true,
                 'internship.subject': true,
                 'internship.studentTask': true,
-                'internship.student': true,
                 'internship.teacher': true,
-                'supervisor.name': true,
+                'student.student_id': true,
+                'supervisor.first_name': true,
+                'supervisor.last_name': true,
                 'supervisor.mail': true,
                 'supervisor.phone': true,
             });
@@ -161,6 +186,14 @@ export default function CreateInternship() {
             return;
         }
 
+        transform((data) => ({
+            ...data,
+            internship: {
+                ...data.internship,
+                startDate: new Date(data.internship.startDate).toLocaleString('fr-FR').split(' ')[0],
+                endDate: new Date(data.internship.endDate).toLocaleString('fr-FR').split(' ')[0],
+            },
+        }));
         post('/admin/internships', {
             onSuccess: () => {
                 reset();
@@ -221,15 +254,12 @@ export default function CreateInternship() {
                                 onCompanySelect={(company) => {
                                     setData('company', {
                                         siren: company.siren,
-                                        name: company.nom_complet,
                                     });
                                 }}
                                 onBlurEffect={(fieldName, value) => handleBlurField(fieldName, value)}
                                 error={getError('company.siren')}
                             />
-                            {getError('company.siren') && (
-                                <p className="mt-1 text-sm text-red-600">{getError('company.siren')}</p>
-                            )}
+                            {getError('company.siren') && <p className="mt-1 text-sm text-red-600">{getError('company.siren')}</p>}
                         </div>
 
                         {/* PÉRIODE DU STAGE */}
@@ -258,7 +288,7 @@ export default function CreateInternship() {
                                         Date de début <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                        className={`w-full rounded-md border ${getError("internship.startDate") ? 'border-red-500' : 'border-gray-300'} px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                         type="date"
                                         id="startDate"
                                         value={data.internship.startDate}
@@ -284,7 +314,7 @@ export default function CreateInternship() {
                                         Date de fin <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                        className={`w-full rounded-md border ${getError("internship.endDate") ? 'border-red-500' : 'border-gray-300'} px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                         type="date"
                                         id="endDate"
                                         value={data.internship.endDate}
@@ -310,16 +340,16 @@ export default function CreateInternship() {
                                 <p className="mb-2 block text-sm font-medium text-gray-700">
                                     Télétravail <span className="text-red-500">*</span>
                                 </p>
-                                <div className="flex gap-6">
+                                <div className={`flex gap-6`}>
                                     <label htmlFor="remoteYes" className="flex cursor-pointer items-center">
                                         <input
                                             name="isRemote"
                                             id="remoteYes"
                                             type="radio"
                                             value="Oui"
-                                            checked={data.internship.isRemote === 'Oui'}
-                                            onBlur={(e) => handleBlurField('internship.isRemote', e.target.value)}
-                                            onChange={(e) => setData('internship.isRemote', e.target.value)}
+                                            checked={data.internship.isRemote === 'true'}
+                                            onBlur={(e) => handleBlurField('internship.isRemote', data.internship.isRemote)}
+                                            onChange={(e) => setData('internship.isRemote', 'true')}
                                             className="mr-2"
                                         />
                                         Oui
@@ -330,17 +360,15 @@ export default function CreateInternship() {
                                             id="remoteNo"
                                             type="radio"
                                             value="Non"
-                                            checked={data.internship.isRemote === 'Non'}
-                                            onBlur={(e) => handleBlurField('internship.isRemote', e.target.value)}
-                                            onChange={(e) => setData('internship.isRemote', e.target.value)}
+                                            checked={data.internship.isRemote === 'false'}
+                                            onBlur={(e) => handleBlurField('internship.isRemote', data.internship.isRemote)}
+                                            onChange={(e) => setData('internship.isRemote', 'false')}
                                             className="mr-2"
                                         />
                                         Non
                                     </label>
                                 </div>
-                                {getError('internship.isRemote') && (
-                                    <p className="mt-1 text-sm text-red-600">{getError('internship.isRemote')}</p>
-                                )}
+                                {getError('internship.isRemote') && <p className="mt-1 text-sm text-red-600">{getError('internship.isRemote')}</p>}
                             </div>
                         </div>
 
@@ -369,7 +397,7 @@ export default function CreateInternship() {
                                     Sujet de stage <span className="text-red-500">*</span>
                                 </label>
                                 <input
-                                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                    className={`w-full rounded-md border ${getError("internship.subject") ? 'border-red-500' : 'border-gray-300'} px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                     id="internshipSubject"
                                     type="text"
                                     value={data.internship.subject}
@@ -396,7 +424,7 @@ export default function CreateInternship() {
                                     Tâches de l'étudiant <span className="text-red-500">*</span>
                                 </label>
                                 <textarea
-                                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                    className={`w-full rounded-md border ${getError("internship.studentTask") ? 'border-red-500' : 'border-gray-300'} px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                     id="studentTask"
                                     rows={4}
                                     value={data.internship.studentTask}
@@ -423,7 +451,7 @@ export default function CreateInternship() {
                                     Commentaire
                                 </label>
                                 <textarea
-                                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                    className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                     id="comment"
                                     rows={3}
                                     value={data.internship.comment}
@@ -460,38 +488,23 @@ export default function CreateInternship() {
 
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 <div>
-                                    <label htmlFor="student" className="mb-2 block text-sm font-medium text-gray-700">
-                                        Étudiant en stage <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
-                                        id="student"
-                                        type="text"
-                                        value={data.internship.student}
-                                        onChange={(e) =>
-                                            setData('internship', {
-                                                ...data.internship,
-                                                student: e.target.value,
-                                            })
-                                        }
-                                        onBlur={(e) => handleBlurField('internship.student', e.target.value)}
-                                        aria-invalid={getError('internship.student') ? 'true' : 'false'}
-                                        aria-describedby={getError('internship.student') ? 'student-error' : undefined}
-                                        placeholder="Nom et prénom de l'étudiant"
+                                    <StudentSearchInput
+                                    onStudentSelect={(student)=>{
+                                        setData("student", {
+                                            student_id: student.student_id
+                                        });
+                                    }}
+                                    onBlurEffect={(fieldName: FieldName, value:any)=>handleBlurField(fieldName, value)}
+                                    error={getError("student.student_id")}
                                     />
-                                    {getError('internship.student') && (
-                                        <p id="student-error" className="mt-1 text-sm text-red-600">
-                                            {getError('internship.student')}
-                                        </p>
-                                    )}
+                                    {getError('student.student_id') && <p className="mt-1 text-sm text-red-600">{getError('student.student_id')}</p>}
                                 </div>
-
                                 <div>
                                     <label htmlFor="teacher" className="mb-2 block text-sm font-medium text-gray-700">
                                         Maître de stage <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                        className={`w-full rounded-md border ${frontErrors['internship.teacher'] || errors['internship.teacher'] ? 'border-red-500' : 'border-gray-300'} px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                         id="teacher"
                                         type="text"
                                         value={data.internship.teacher}
@@ -535,34 +548,63 @@ export default function CreateInternship() {
                                 <h2 className="text-xl font-semibold text-gray-800">Tuteur de stage</h2>
                             </div>
 
-                            <div className="mb-4">
-                                <label htmlFor="supervisorName" className="mb-2 block text-sm font-medium text-gray-700">
-                                    Nom <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    className="w-full rounded-md border border-gray-300 bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
-                                    id="supervisorName"
-                                    type="text"
-                                    value={data.supervisor.name}
-                                    onChange={(e) =>
-                                        setData('supervisor', {
-                                            ...data.supervisor,
-                                            name: e.target.value,
-                                        })
-                                    }
-                                    onBlur={(e) => handleBlurField('supervisor.name', e.target.value)}
-                                    aria-invalid={getError('supervisor.name') ? 'true' : 'false'}
-                                    aria-describedby={getError('supervisor.name') ? 'supervisorName-error' : undefined}
-                                    placeholder="Nom et prénom du tuteur"
-                                />
-                                {getError('supervisor.name') && (
-                                    <p id="supervisorName-error" className="mt-1 text-sm text-red-600">
-                                        {getError('supervisor.name')}
-                                    </p>
-                                )}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <label htmlFor="supervisorFirstName" className="mb-2 block text-sm font-medium text-gray-700">
+                                        Prénom <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        className={`w-full rounded-md border ${frontErrors['supervisor.first_name'] || errors['supervisor.first_name'] ? 'border-red-500' : 'border-gray-300'} bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
+                                        id="supervisorFirstName"
+                                        type="text"
+                                        value={data.supervisor.first_name}
+                                        onChange={(e) =>
+                                            setData('supervisor', {
+                                                ...data.supervisor,
+                                                first_name: e.target.value,
+                                            })
+                                        }
+                                        onBlur={(e) => handleBlurField('supervisor.first_name', e.target.value)}
+                                        aria-invalid={getError('supervisor.first_name') ? 'true' : 'false'}
+                                        aria-describedby={getError('supervisor.first_name') ? 'supervisorFirstName-error' : undefined}
+                                        placeholder="Prénom du tuteur"
+                                    />
+                                    {getError('supervisor.first_name') && (
+                                        <p id="supervisorFirstName-error" className="mt-1 text-sm text-red-600">
+                                            {getError('supervisor.first_name')}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label htmlFor="supervisorLastName" className="mb-2 block text-sm font-medium text-gray-700">
+                                        Nom <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        className={`w-full rounded-md border ${frontErrors['supervisor.last_name'] || errors['supervisor.last_name'] ? 'border-red-500' : 'border-gray-300'} bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
+                                        id="supervisorLastName"
+                                        type="text"
+                                        value={data.supervisor.last_name}
+                                        onChange={(e) =>
+                                            setData('supervisor', {
+                                                ...data.supervisor,
+                                                last_name: e.target.value,
+                                            })
+                                        }
+                                        onBlur={(e) => handleBlurField('supervisor.last_name', e.target.value)}
+                                        aria-invalid={getError('supervisor.last_name') ? 'true' : 'false'}
+                                        aria-describedby={getError('supervisor.last_name') ? 'supervisorLastName-error' : undefined}
+                                        placeholder="Nom du tuteur"
+                                    />
+                                    {getError('supervisor.last_name') && (
+                                        <p id="supervisorLastName-error" className="mt-1 text-sm text-red-600">
+                                            {getError('supervisor.last_name')}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
 
-                            <div className="mb-4">
+                            <div className="mt-4">
                                 <label htmlFor="supervisorMail" className="mb-2 block text-sm font-medium text-gray-700">
                                     Email <span className="text-red-500">*</span>
                                 </label>
@@ -584,7 +626,7 @@ export default function CreateInternship() {
                                         </svg>
                                     </div>
                                     <input
-                                        className="w-full rounded-md border border-gray-300 bg-white py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                        className={`w-full rounded-md border ${frontErrors['supervisor.mail'] || errors['supervisor.mail'] ? 'border-red-500' : 'border-gray-300'} bg-white py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                         id="supervisorMail"
                                         type="email"
                                         value={data.supervisor.mail}
@@ -607,7 +649,7 @@ export default function CreateInternship() {
                                 )}
                             </div>
 
-                            <div>
+                            <div className="mt-4">
                                 <label htmlFor="supervisorPhone" className="mb-2 block text-sm font-medium text-gray-700">
                                     Téléphone <span className="text-red-500">*</span>
                                 </label>
@@ -629,7 +671,7 @@ export default function CreateInternship() {
                                         </svg>
                                     </div>
                                     <input
-                                        className="w-full rounded-md border border-gray-300 bg-white py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                        className={`w-full rounded-md border ${frontErrors['supervisor.phone'] || errors['supervisor.phone'] ? 'border-red-500' : 'border-gray-300'} bg-white py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                         id="supervisorPhone"
                                         type="tel"
                                         value={data.supervisor.phone}
