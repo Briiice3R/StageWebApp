@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('supervisors', function (Blueprint $table) {
             $table->id();
-            $table->string("name");
+            $table->string("first_name");
+            $table->string("last_name");
             $table->string("mail")->nullable();
             $table->string("phone")->nullable();
             

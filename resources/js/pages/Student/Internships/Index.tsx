@@ -5,7 +5,7 @@ export default function Internships({internships}:any){
         <>
             <Head title="Stages">
             </Head>
-            <div className="bg-blue-100 min-h-screen p-4">
+            <div className="min-h-screen min-h-screen">
                 <CompanySearchInput />
                 {internships.map((key:any, element:any) => (
                     <li>{element.id}</li>

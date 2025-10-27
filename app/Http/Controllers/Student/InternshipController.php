@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Internships;
+namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -15,7 +15,7 @@ class InternshipController extends Controller
     public function index()
     {
         $data = Internship::all();
-        return Inertia::render("Internships/Index", [
+        return Inertia::render("Student/Internships/Index", [
             "internships"=>$data
         ]);
     }
