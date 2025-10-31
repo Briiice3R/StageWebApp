@@ -22,7 +22,11 @@ class StudentController extends Controller
         }
         $query = $request->query("q");
         $students = Student::query()
-            ->whereRaw("LOWER(CONCAT(first_name, last_name)) LIKE LOWER(?)% OR student_id LIKE ?%", [$query]);
-        return response()->json($students, 200);
+            ->whereRaw("LOWER(first_name || ' ' || last_name) LIKE LOWER(?) OR student_id LIKE ?", ["%".strtolower($query)."%", "%".strtolower($query)."%"])
+            ->get();
+        
+        return response()->json([
+            "data"=> $students
+        ], 200);
     }
 }
