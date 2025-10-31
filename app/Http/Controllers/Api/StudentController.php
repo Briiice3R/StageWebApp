@@ -11,7 +11,9 @@ class StudentController extends Controller
     public function index(Request $request){
         $students = Student::query()
             ->get();
-        return response()->json($students);
+        return response()->json([
+            "data"=>$students
+        ]);
     }
 
     public function search(Request $request){
