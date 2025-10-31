@@ -1,6 +1,8 @@
+import { useAutoComplete } from '@/hooks/useAutoComplete';
 import companyHandler from '@/utils/companyHandler';
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Label } from '@headlessui/react';
-import { useEffect, useState } from 'react';
+
+
 
 type Company = {
     siren: string;
@@ -21,53 +23,16 @@ type CompanySearchInputProps = {
 };
 
 export default function CompanySearchInput({ onCompanySelect, error, onBlurEffect }: CompanySearchInputProps) {
-    const [companyQuery, setCompanyQuery] = useState<string>('');
-    const [companyData, setCompanyData] = useState<Company[]>([]);
-    const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-    const [apiError, setApiError] = useState<string>('');
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (!companyQuery.trim() || companyQuery.trim().length < 3) {
-            setCompanyData([]);
-            setApiError('');
-            setIsLoading(false);
-            return;
-        }
-
-        const abortController = new AbortController();
-
-        const interval = setTimeout(async () => {
-            setIsLoading(true);
-            setApiError('');
-
-            try {
-                const reqApi = await companyHandler.getCompanyByText(companyQuery.trim(), abortController.signal);
-
-                if (reqApi.data && reqApi.data.results) {
-                    setCompanyData(reqApi.data.results);
-
-                    if (reqApi.data.results.length === 0) {
-                        setApiError('Aucune entreprise trouvée');
-                    }
-                } else {
-                    setApiError('Erreur lors de la recherche');
-                }
-            } catch (error: any) {
-                if (error.name !== 'AbortError') {
-                    setApiError("Erreur de connexion à l'API");
-                    console.error('Erreur API:', error);
-                }
-            } finally {
-                setIsLoading(false);
-            }
-        }, 800);
-
-        return () => {
-            clearTimeout(interval);
-            abortController.abort();
-        };
-    }, [companyQuery]);
+    const {
+        query, setQuery, 
+        data, setData, 
+        selected, setSelected, 
+        apiError, setApiError, 
+        isLoading} = useAutoComplete<Company>(
+        companyHandler.getCompanyByText,
+        3,
+        800
+    );
 
     return (
         <Field className="w-full" id="companies">
@@ -75,10 +40,10 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
                 Nom de l'entreprise / SIREN <span className="text-red-500">*</span>
             </Label>
             <Combobox
-                value={selectedCompany}
+                value={selected}
                 onChange={(c: Company | null) => {
-                    setSelectedCompany(c);
-                    setCompanyData([]);
+                    setSelected(c);
+                    setData([]);
                     setApiError('');
 
                     if (c) {
@@ -93,12 +58,12 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
                             error ? 'border-red-500' : 'border-gray-300'
                         }`}
                         onChange={(e) => {
-                            setCompanyQuery(e.target.value);
-                            setSelectedCompany(null);
+                            setQuery(e.target.value);
+                            setSelected(null);
                         }}
                         onBlur={() => {
-                            if (selectedCompany) {
-                                onBlurEffect('company.siren', selectedCompany.siren);
+                            if (selected) {
+                                onBlurEffect('company.siren', selected.siren);
                             } else {
                                 onBlurEffect('company.siren', '');
                             }
@@ -121,10 +86,10 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
                         </div>
                     )}
 
-                    {(companyData.length > 0 || (apiError && companyQuery.length >= 3)) && (
+                    {(data.length > 0 || (apiError && data.length >= 3)) && (
                         <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-300 bg-white py-1 shadow-lg focus:outline-none">
-                            {companyData.length > 0 ? (
-                                companyData.map((c: Company) => (
+                            {data.length > 0 ? (
+                                data.map((c: Company) => (
                                     <ComboboxOption
                                         className={({ focus }) =>
                                             `${focus ? 'bg-blue-50' : 'bg-white even:bg-gray-50'} relative cursor-pointer select-none px-4 py-3 transition-colors hover:bg-blue-100`
