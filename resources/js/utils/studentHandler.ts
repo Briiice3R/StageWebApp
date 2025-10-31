@@ -7,7 +7,11 @@ const studentHandler = {
             if(!reqApi.ok){
                 throw new Error("Erreur API");
             }
+            
             const data = await reqApi.json();
+            
+            
+            
             return {data};
         } catch(e){
             throw e;

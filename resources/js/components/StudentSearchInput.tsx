@@ -35,6 +35,8 @@ export default function StudentSearchInput({ onStudentSelect, onBlurEffect, erro
             setApiError('');
             try {
                 const reqApi = await studentHandler.getStudentByText(studentQuery.trim(), abortController.signal);
+                
+                
                 if (reqApi.data && reqApi.data.data) {
                     setStudentData(reqApi.data.data);
                     if (reqApi.data.data.length === 0) setApiError('Aucun étudiant trouvé.');
