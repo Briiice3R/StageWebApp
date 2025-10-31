@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Student\InternshipController as StudentInternshipController;
 use App\Http\Controllers\Admin\InternshipController as AdminInternshipController;
+use App\Http\Controllers\Admin\StudentController as StudentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -12,5 +13,7 @@ Route::prefix("admin")->name("admin.")->group(function(){
         ->name("internships.create");
         Route::post("/internships", [AdminInternshipController::class, "store"])
         ->name("internships.store");
+        Route::get("/students", [StudentController::class, "index"])
+        ->name("students");
 
 });
