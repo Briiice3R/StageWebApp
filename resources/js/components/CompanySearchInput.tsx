@@ -1,17 +1,9 @@
 import { useAutoComplete } from '@/hooks/useAutoComplete';
 import companyHandler from '@/utils/companyHandler';
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Label } from '@headlessui/react';
+import { Company } from '@/types/model';
 
 
-
-type Company = {
-    siren: string;
-    nom_complet: string;
-    nom_raison_sociale: string;
-    siege: {
-        commune: string;
-    };
-};
 
 
 type FieldName = 'company.siren';
@@ -24,10 +16,10 @@ type CompanySearchInputProps = {
 
 export default function CompanySearchInput({ onCompanySelect, error, onBlurEffect }: CompanySearchInputProps) {
     const {
-        query, setQuery, 
-        data, setData, 
-        selected, setSelected, 
-        apiError, setApiError, 
+        setQuery,
+        data, setData,
+        selected, setSelected,
+        apiError, setApiError,
         isLoading} = useAutoComplete<Company>(
         companyHandler.getCompanyByText,
         3,

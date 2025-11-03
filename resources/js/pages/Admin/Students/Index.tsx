@@ -1,12 +1,7 @@
 import { Head } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
-import AdminDashboardSidebar from '@/components/AdminDashboardSidebar';
 
-type Student = {
-    student_id: string;
-    first_name: string;
-    last_name: string;
-};
+import AdminDashboardSidebar from '@/components/AdminDashboardSidebar';
+import { Student } from '@/types/model';
 
 type StudentsProps = {
     students: Student[];
@@ -16,10 +11,10 @@ export default function StudentsIndex({students}: StudentsProps){
     return (
         <>
             <Head title="Étudiants" />
-            
+
             <div className="flex min-h-screen bg-gray-50 p-8">
                 <AdminDashboardSidebar />
-                
+
                 <main className="flex-1 p-8">
                     <div className="mx-auto max-w-6xl">
                         {/* Header */}
@@ -65,7 +60,7 @@ export default function StudentsIndex({students}: StudentsProps){
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 {students.map((student) => (
                                     <div
-                                        key={student.id}
+                                        key={student.student_id}
                                         className="group rounded-lg bg-white p-6 shadow-md transition-all duration-200 hover:shadow-lg"
                                     >
                                         {/* Avatar */}
