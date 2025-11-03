@@ -1,60 +1,29 @@
+import { useAutoComplete } from '@/hooks/useAutoComplete';
+
 import studentHandler from '@/utils/studentHandler';
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Label } from '@headlessui/react';
-import { useEffect, useState } from 'react';
-type Student = {
-    student_id: string;
-    first_name: string;
-    last_name: string;
-};
+import { Student } from '@/types/model';
+
 
 type FieldName = 'student.student_id';
 type StudentSearchInputProps = {
     onStudentSelect: (student: Student) => void;
-    onBlurEffect: (fieldName: FieldName, value: any) => void;
+    onBlurEffect: (fieldName: FieldName, value: string) => void;
     error?: string;
 };
 
 export default function StudentSearchInput({ onStudentSelect, onBlurEffect, error }: StudentSearchInputProps) {
-    const [studentQuery, setStudentQuery] = useState<string>('');
-    const [studentData, setStudentData] = useState<Student[]>([]);
-    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-    const [apiError, setApiError] = useState<string>('');
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (!studentQuery.trim()) {
-            setStudentData([]);
-            setApiError('');
-            setIsLoading(false);
-            return;
-        }
-        const abortController = new AbortController();
-
-        const interval = setTimeout(async () => {
-            setIsLoading(true);
-            setApiError('');
-            try {
-                const reqApi = await studentHandler.getStudentByText(studentQuery.trim(), abortController.signal);
-                
-                
-                if (reqApi.data && reqApi.data.data) {
-                    setStudentData(reqApi.data.data);
-                    if (reqApi.data.data.length === 0) setApiError('Aucun étudiant trouvé.');
-                } else setApiError('Erreur lors de la recherche.');
-            } catch (e: any) {
-                if (e.name !== 'AbortError') {
-                    setApiError("Erreur de connexion à l'API.");
-                    console.error('Erreur API : ', e);
-                }
-            } finally {
-                setIsLoading(false);
-            }
-        }, 800);
-        return () => {
-            clearTimeout(interval);
-            abortController.abort();
-        };
-    }, [studentQuery]);
+    const {
+        setQuery,
+        data, setData,
+        selected, setSelected,
+        apiError, setApiError,
+        isLoading
+    } = useAutoComplete<Student>(
+        studentHandler.getStudentByText,
+        0,
+        800
+    );
 
     return (
         <Field className="w-full">
@@ -62,10 +31,10 @@ export default function StudentSearchInput({ onStudentSelect, onBlurEffect, erro
                 Étudiant <span className="text-red-500">*</span>
             </Label>
             <Combobox
-                value={selectedStudent}
+                value={selected}
                 onChange={(s: Student | null) => {
-                    setSelectedStudent(s);
-                    setStudentData([]);
+                    setSelected(s);
+                    setData([]);
                     setApiError('');
                     if (s) {
                         onStudentSelect(s);
@@ -77,12 +46,12 @@ export default function StudentSearchInput({ onStudentSelect, onBlurEffect, erro
                         displayValue={(s: Student | null) => (s ? `${s.last_name} ${s.first_name}` : '')}
                         className={`w-full rounded-md border px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 ${error ? 'border-red-500' : 'border-gray-300'} }`}
                         onChange={(e) => {
-                            setStudentQuery(e.target.value);
-                            setSelectedStudent(null);
+                            setQuery(e.target.value);
+                            setSelected(null);
                         }}
                         onBlur={() => {
-                            if (selectedStudent) {
-                                onBlurEffect('student.student_id', selectedStudent.student_id);
+                            if (selected) {
+                                onBlurEffect('student.student_id', selected.student_id);
                             } else {
                                 onBlurEffect('student.student_id', '');
                             }
@@ -105,10 +74,10 @@ export default function StudentSearchInput({ onStudentSelect, onBlurEffect, erro
                         </div>
                     )}
 
-                    {(studentData.length > 0 || apiError) && (
+                    {(data.length > 0 || apiError) && (
                         <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-300 bg-white py-1 shadow-lg focus:outline-none">
-                            {studentData.length > 0
-                                ? studentData.map((s: Student) => (
+                            {data.length > 0
+                                ? data.map((s: Student) => (
                                       <ComboboxOption
                                           className={({ focus }) =>
                                               `${focus ? 'bg-blue-50' : 'bg-white even:bg-gray-50'} relative cursor-pointer px-4 py-3 transition-colors select-none hover:bg-blue-100`
@@ -128,7 +97,7 @@ export default function StudentSearchInput({ onStudentSelect, onBlurEffect, erro
                     )}
                 </div>
             </Combobox>
-            
+
         </Field>
     );
 }
