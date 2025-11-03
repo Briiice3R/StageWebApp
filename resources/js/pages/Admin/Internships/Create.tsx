@@ -19,22 +19,10 @@ type FieldName =
     | 'supervisor.phone'
     | 'student.student_id';
 
-type Student = {
-    student_id: string;
-    first_name: string;
-    last_name: string;
-};
-
+// noinspection JSUnusedGlobalSymbols
 export default function CreateInternship() {
     const [frontErrors, setFrontErrors] = useState<Partial<Record<FieldName, string>>>({});
-    const [hasTouched, setHasTouched] = useState<Partial<Record<FieldName, boolean>>>({});
-
-    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-    const [studentQuery, setStudentQuery] = useState<string>('');
-    const [studentData, setStudentData] = useState<Student[]>([]);
-    const [apiError, setApiError] = useState<string>('');
-
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [, setHasTouched] = useState<Partial<Record<FieldName, boolean>>>({});
 
     const { data, setData, post, processing, errors, reset, transform } = useForm({
         internship: {
@@ -64,7 +52,7 @@ export default function CreateInternship() {
         return frontErrors[fieldName] || errors[fieldName as keyof typeof errors];
     };
 
-    const handleBlurField = (fieldName: FieldName, value: any) => {
+    const handleBlurField = (fieldName: FieldName, value: string) => {
         setHasTouched((prev) => ({ ...prev, [fieldName]: true }));
 
         const error = validationFields(fieldName, value);
@@ -80,7 +68,7 @@ export default function CreateInternship() {
         });
     };
 
-    const validationFields = (fieldName: FieldName, value: any) => {
+    const validationFields = (fieldName: FieldName, value: string) => {
         switch (fieldName) {
             case 'company.siren':
                 if (!value) return 'Vous devez sélectionner une entreprise.';
@@ -126,17 +114,19 @@ export default function CreateInternship() {
                 if (!value) return 'Le nom du tuteur est requis.';
                 break;
 
-            case 'supervisor.mail':
+            case 'supervisor.mail': {
                 if (!value) return "L'email du tuteur est requis.";
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(value)) return "L'email doit être valide.";
                 break;
+            }
 
-            case 'supervisor.phone':
+            case 'supervisor.phone':{
                 if (!value) return 'Le téléphone du tuteur est requis.';
                 const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
                 if (!phoneRegex.test(value)) return 'Le numéro de téléphone doit être valide (format français).';
                 break;
+            }
         }
         return null;
     };
@@ -202,6 +192,7 @@ export default function CreateInternship() {
             },
         });
     };
+
 
     return (
         <>
@@ -347,8 +338,8 @@ export default function CreateInternship() {
                                                 type="radio"
                                                 value="Oui"
                                                 checked={data.internship.isRemote === 'true'}
-                                                onBlur={(e) => handleBlurField('internship.isRemote', data.internship.isRemote)}
-                                                onChange={(e) => setData('internship.isRemote', 'true')}
+                                                onBlur={(e) => handleBlurField('internship.isRemote', e.target.value)}
+                                                onChange={() => setData('internship.isRemote', 'true')}
                                                 className="mr-2"
                                             />
                                             Oui
@@ -360,8 +351,8 @@ export default function CreateInternship() {
                                                 type="radio"
                                                 value="Non"
                                                 checked={data.internship.isRemote === 'false'}
-                                                onBlur={(e) => handleBlurField('internship.isRemote', data.internship.isRemote)}
-                                                onChange={(e) => setData('internship.isRemote', 'false')}
+                                                onBlur={(e) => handleBlurField('internship.isRemote', e.target.value)}
+                                                onChange={() => setData('internship.isRemote', 'false')}
                                                 className="mr-2"
                                             />
                                             Non
@@ -495,7 +486,7 @@ export default function CreateInternship() {
                                                     student_id: student.student_id,
                                                 });
                                             }}
-                                            onBlurEffect={(fieldName: FieldName, value: any) => handleBlurField(fieldName, value)}
+                                            onBlurEffect={(fieldName, value) => handleBlurField(fieldName, value)}
                                             error={getError('student.student_id')}
                                         />
                                         {getError('student.student_id') && (
