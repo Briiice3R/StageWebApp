@@ -19,3 +19,8 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface ValidationRules {
+    condition: (value: string)=>boolean,
+    errorMessage: string
+}
