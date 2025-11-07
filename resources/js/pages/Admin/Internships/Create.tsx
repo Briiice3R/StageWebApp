@@ -2,7 +2,9 @@ import AdminDashboardSidebar from '@/components/AdminDashboardSidebar';
 import CompanySearchInput from '@/components/CompanySearchInput';
 import StudentSearchInput from '@/components/StudentSearchInput';
 import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler } from 'react';
+import { useValidation } from '@/hooks/useValidation';
+import {ValidationRules} from '@/types';
 
 type FieldName =
     | 'company.siren'
@@ -11,19 +13,16 @@ type FieldName =
     | 'internship.subject'
     | 'internship.studentTask'
     | 'internship.comment'
-    | 'internship.teacher'
     | 'internship.isRemote'
     | 'supervisor.first_name'
     | 'supervisor.last_name'
     | 'supervisor.mail'
     | 'supervisor.phone'
-    | 'student.student_id';
+    | 'student.student_id'
+    | 'teacher.teacher_id';
 
 // noinspection JSUnusedGlobalSymbols
 export default function CreateInternship() {
-    const [frontErrors, setFrontErrors] = useState<Partial<Record<FieldName, string>>>({});
-    const [, setHasTouched] = useState<Partial<Record<FieldName, boolean>>>({});
-
     const { data, setData, post, processing, errors, reset, transform } = useForm({
         internship: {
             startDate: '',
@@ -31,8 +30,10 @@ export default function CreateInternship() {
             subject: '',
             studentTask: '',
             comment: '',
-            teacher: '',
             isRemote: '',
+        },
+        teacher:{
+            teacher_id: ''
         },
         student: {
             student_id: '',
@@ -47,150 +48,139 @@ export default function CreateInternship() {
             phone: '',
         },
     });
-
-    const getError = (fieldName: FieldName) => {
-        return frontErrors[fieldName] || errors[fieldName as keyof typeof errors];
+    const rules: Partial<Record<FieldName, ValidationRules[]>> = {
+        'company.siren': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez sélectionner une entreprise.',
+            },
+        ],
+        'internship.startDate': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez saisir une date de début.',
+            },
+        ],
+        'internship.endDate': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez saisir une date de fin.',
+            },
+            {
+                condition: (v) => {
+                    if (!data.internship.startDate) return false;
+                    return v <= data.internship.startDate;
+                },
+                errorMessage: 'La date de fin doit être supérieure à la date de début du stage.',
+            },
+        ],
+        'internship.isRemote': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez chosir si le stage est en télétravail.',
+            },
+        ],
+        'internship.subject': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez saisir un sujet de stage.',
+            },
+            {
+                condition: (v) => v.length < 10,
+                errorMessage: 'Le sujet doit faire au moins 10 caractères.',
+            },
+        ],
+        'internship.studentTask': [
+            {
+                condition: (v) => !v,
+                errorMessage: "Vous devez saisir les tâches de l'étudiant",
+            },
+            {
+                condition: (v) => v.length < 20,
+                errorMessage: 'Vous devez saisir au minimum 20 caractères.',
+            },
+        ],
+        'student.student_id': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez sélectionner un étudiant.',
+            },
+        ],
+        'teacher.teacher_id': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez sélectionner un maître de stage.',
+            },
+        ],
+        'supervisor.first_name': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez saisir le prénom du tuteur.',
+            },
+        ],
+        'supervisor.last_name': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez saisir le nom du tuteur.',
+            },
+        ],
+        'supervisor.mail': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez saisir le mail du tuteur.',
+            },
+            {
+                condition: (v) => {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return !emailRegex.test(v);
+                },
+                errorMessage: 'Le mail doit être valide.',
+            },
+        ],
+        'supervisor.phone': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez saisir le numéro de téléphone du tuteur.',
+            },
+            {
+                condition: (v) => {
+                    const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+                    return !phoneRegex.test(v);
+                },
+                errorMessage: 'Le numéro de téléhpone doit être valide.',
+            },
+        ],
     };
+    const {getError, validate, handleBlurField, setFrontErrors, setHasTouched} = useValidation(
+        errors,
+        rules,
+        data
 
-    const handleBlurField = (fieldName: FieldName, value: string) => {
-        setHasTouched((prev) => ({ ...prev, [fieldName]: true }));
-
-        const error = validationFields(fieldName, value);
-
-        setFrontErrors((prev) => {
-            const newErrors = { ...prev };
-            if (error) {
-                newErrors[fieldName] = error;
-            } else {
-                delete newErrors[fieldName];
-            }
-            return newErrors;
-        });
-    };
-
-    const validationFields = (fieldName: FieldName, value: string) => {
-        switch (fieldName) {
-            case 'company.siren':
-                if (!value) return 'Vous devez sélectionner une entreprise.';
-                break;
-
-            case 'internship.startDate':
-                if (!value) return 'Vous devez saisir une date de début.';
-                break;
-
-            case 'internship.endDate':
-                if (!value) return 'Vous devez saisir une date de fin.';
-                if (data.internship.startDate && value <= data.internship.startDate) {
-                    return 'La date de fin doit être supérieure à la date de début.';
-                }
-                break;
-
-            case 'internship.isRemote':
-                if (!value) return 'Vous devez choisir une option de télétravail.';
-                break;
-
-            case 'internship.subject':
-                if (!value) return 'Le sujet du stage est requis.';
-                if (value.length < 10) return 'Le sujet doit faire au moins 10 caractères.';
-                break;
-
-            case 'internship.studentTask':
-                if (!value) return "Les tâches de l'étudiant sont requises.";
-                if (value.length < 20) return 'Veuillez décrire les tâches plus en détail (min. 20 caractères).';
-                break;
-
-            case 'student.student_id':
-                if (!value) return 'Vous devez sélectionner un étudiant.';
-                break;
-
-            case 'internship.teacher':
-                if (!value) return 'Le nom du maître de stage est requis.';
-                break;
-
-            case 'supervisor.first_name':
-                if (!value) return 'Le prénom du tuteur est requis.';
-                break;
-            case 'supervisor.last_name':
-                if (!value) return 'Le nom du tuteur est requis.';
-                break;
-
-            case 'supervisor.mail': {
-                if (!value) return "L'email du tuteur est requis.";
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) return "L'email doit être valide.";
-                break;
-            }
-
-            case 'supervisor.phone':{
-                if (!value) return 'Le téléphone du tuteur est requis.';
-                const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
-                if (!phoneRegex.test(value)) return 'Le numéro de téléphone doit être valide (format français).';
-                break;
-            }
-        }
-        return null;
-    };
-
+    );
     const handleSubmit: FormEventHandler = (e) => {
-        e.preventDefault();
-        const validationErrors: Partial<Record<FieldName, string>> = {};
+        const isValidate:boolean = validate(e);
 
-        validationErrors['company.siren'] = validationFields('company.siren', data.company.siren) || undefined;
-        validationErrors['internship.startDate'] = validationFields('internship.startDate', data.internship.startDate) || undefined;
-        validationErrors['internship.endDate'] = validationFields('internship.endDate', data.internship.endDate) || undefined;
-        validationErrors['internship.isRemote'] = validationFields('internship.isRemote', data.internship.isRemote) || undefined;
-        validationErrors['internship.subject'] = validationFields('internship.subject', data.internship.subject) || undefined;
-        validationErrors['internship.studentTask'] = validationFields('internship.studentTask', data.internship.studentTask) || undefined;
-        validationErrors['internship.teacher'] = validationFields('internship.teacher', data.internship.teacher) || undefined;
-        validationErrors['student.student_id'] = validationFields('student.student_id', data.student.student_id) || undefined;
-        validationErrors['supervisor.first_name'] = validationFields('supervisor.first_name', data.supervisor.first_name) || undefined;
-        validationErrors['supervisor.last_name'] = validationFields('supervisor.last_name', data.supervisor.last_name) || undefined;
-        validationErrors['supervisor.mail'] = validationFields('supervisor.mail', data.supervisor.mail) || undefined;
-        validationErrors['supervisor.phone'] = validationFields('supervisor.phone', data.supervisor.phone) || undefined;
 
-        Object.keys(validationErrors).forEach((key) => {
-            if (!validationErrors[key as FieldName]) delete validationErrors[key as FieldName];
-        });
-
-        if (Object.keys(validationErrors).length > 0) {
-            setFrontErrors(validationErrors);
-
-            setHasTouched({
-                'company.siren': true,
-                'internship.startDate': true,
-                'internship.endDate': true,
-                'internship.isRemote': true,
-                'internship.subject': true,
-                'internship.studentTask': true,
-                'internship.teacher': true,
-                'student.student_id': true,
-                'supervisor.first_name': true,
-                'supervisor.last_name': true,
-                'supervisor.mail': true,
-                'supervisor.phone': true,
+        if(isValidate){
+            transform((data) => ({
+                ...data,
+                internship: {
+                    ...data.internship,
+                    startDate: new Date(data.internship.startDate).toLocaleString('fr-FR').split(' ')[0],
+                    endDate: new Date(data.internship.endDate).toLocaleString('fr-FR').split(' ')[0],
+                },
+            }));
+            post('/admin/internships', {
+                onSuccess: () => {
+                    reset();
+                    setFrontErrors({});
+                    setHasTouched({});
+                },
+                onError: (errors) => {
+                    console.error('Erreurs de validation backend:', errors);
+                },
             });
-
-            return;
         }
-
-        transform((data) => ({
-            ...data,
-            internship: {
-                ...data.internship,
-                startDate: new Date(data.internship.startDate).toLocaleString('fr-FR').split(' ')[0],
-                endDate: new Date(data.internship.endDate).toLocaleString('fr-FR').split(' ')[0],
-            },
-        }));
-        post('/admin/internships', {
-            onSuccess: () => {
-                reset();
-                setFrontErrors({});
-                setHasTouched({});
-            },
-            onError: (errors) => {
-                console.error('Erreurs de validation backend:', errors);
-            },
-        });
     };
 
 
@@ -198,9 +188,9 @@ export default function CreateInternship() {
         <>
             <Head title="Ajouter un stage" />
 
-            <div className="flex min-h-screen bg-gray-50 p-8">
+            <main className="flex min-h-screen bg-gray-50 p-8">
                 <AdminDashboardSidebar />
-                <main className='flex-1 p-8'>
+                <div className='flex-1 p-8'>
                     <div className="mx-auto max-w-4xl rounded-lg bg-white p-8 shadow-md">
                         <div className="mb-6 flex items-center gap-3 border-b border-gray-200 pb-4">
                             <svg
@@ -498,24 +488,23 @@ export default function CreateInternship() {
                                             Maître de stage <span className="text-red-500">*</span>
                                         </label>
                                         <input
-                                            className={`w-full rounded-md border ${frontErrors['internship.teacher'] || errors['internship.teacher'] ? 'border-red-500' : 'border-gray-300'} px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
+                                            className={`w-full rounded-md border ${getError("teacher.teacher_id") ? 'border-red-500' : 'border-gray-300'} px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                             id="teacher"
                                             type="text"
-                                            value={data.internship.teacher}
+                                            value={data.teacher.teacher_id}
                                             onChange={(e) =>
-                                                setData('internship', {
-                                                    ...data.internship,
-                                                    teacher: e.target.value,
+                                                setData('teacher', {
+                                                    teacher_id: e.target.value,
                                                 })
                                             }
-                                            onBlur={(e) => handleBlurField('internship.teacher', e.target.value)}
-                                            aria-invalid={getError('internship.teacher') ? 'true' : 'false'}
-                                            aria-describedby={getError('internship.teacher') ? 'teacher-error' : undefined}
+                                            onBlur={(e) => handleBlurField('teacher.teacher_id', e.target.value)}
+                                            aria-invalid={getError("teacher.teacher_id") ? 'true' : 'false'}
+                                            aria-describedby={getError("teacher.teacher_id") ? 'teacher-error' : undefined}
                                             placeholder="Nom et prénom du maître de stage"
                                         />
-                                        {getError('internship.teacher') && (
+                                        {getError("teacher.teacher_id") && (
                                             <p id="teacher-error" className="mt-1 text-sm text-red-600">
-                                                {getError('internship.teacher')}
+                                                {getError("teacher.teacher_id")}
                                             </p>
                                         )}
                                     </div>
@@ -548,7 +537,7 @@ export default function CreateInternship() {
                                             Prénom <span className="text-red-500">*</span>
                                         </label>
                                         <input
-                                            className={`w-full rounded-md border ${frontErrors['supervisor.first_name'] || errors['supervisor.first_name'] ? 'border-red-500' : 'border-gray-300'} bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
+                                            className={`w-full rounded-md border ${getError('supervisor.first_name') ? 'border-red-500' : 'border-gray-300'} bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                             id="supervisorFirstName"
                                             type="text"
                                             value={data.supervisor.first_name}
@@ -575,7 +564,7 @@ export default function CreateInternship() {
                                             Nom <span className="text-red-500">*</span>
                                         </label>
                                         <input
-                                            className={`w-full rounded-md border ${frontErrors['supervisor.last_name'] || errors['supervisor.last_name'] ? 'border-red-500' : 'border-gray-300'} bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
+                                            className={`w-full rounded-md border ${getError('supervisor.last_name') ? 'border-red-500' : 'border-gray-300'} bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                             id="supervisorLastName"
                                             type="text"
                                             value={data.supervisor.last_name}
@@ -620,7 +609,7 @@ export default function CreateInternship() {
                                             </svg>
                                         </div>
                                         <input
-                                            className={`w-full rounded-md border ${frontErrors['supervisor.mail'] || errors['supervisor.mail'] ? 'border-red-500' : 'border-gray-300'} bg-white py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
+                                            className={`w-full rounded-md border ${getError('supervisor.mail') ? 'border-red-500' : 'border-gray-300'} bg-white py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                             id="supervisorMail"
                                             type="email"
                                             value={data.supervisor.mail}
@@ -665,7 +654,7 @@ export default function CreateInternship() {
                                             </svg>
                                         </div>
                                         <input
-                                            className={`w-full rounded-md border ${frontErrors['supervisor.phone'] || errors['supervisor.phone'] ? 'border-red-500' : 'border-gray-300'} bg-white py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
+                                            className={`w-full rounded-md border ${getError('supervisor.phone') ? 'border-red-500' : 'border-gray-300'} bg-white py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
                                             id="supervisorPhone"
                                             type="tel"
                                             value={data.supervisor.phone}
@@ -728,8 +717,8 @@ export default function CreateInternship() {
                             </button>
                         </form>
                     </div>
-                </main>
-            </div>
+                </div>
+            </main>
         </>
     );
 }
