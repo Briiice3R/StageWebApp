@@ -13,15 +13,15 @@ class TeacherController extends Controller
      */
     public function index()
     {
-        Inertia::render("Admin/Internships/Teacher/Index");
-    }   
+        //Inertia::render("Admin/Teachers/Index");
+    }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        Inertia::render("Admin/Internships/Teacher/Create");
+        return Inertia::render("Admin/Teachers/Create");
     }
 
     /**
