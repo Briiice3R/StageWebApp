@@ -3,7 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 export default function AdminDashboardSidebar() {
     const {url} = usePage();
     const isActivePage = (path:string, isExact=false)=>{
-        if(isExact) return url == path;
+        if(isExact) return url === path || url.substring(0, url.length-1) === path;
         return url.startsWith(path);
     }
     return (
@@ -11,12 +11,12 @@ export default function AdminDashboardSidebar() {
             <div className="flex h-16 items-center justify-center border-b border-gray-200 bg-blue-600 rounded-t-lg">
                 <h1 className="text-xl font-bold text-white">Dashboard Admin</h1>
             </div>
-            
+
             <nav className="p-4">
                 <ul className="space-y-2">
                     <li>
                         <Link
-                            href="/admin/dashboard"
+                            href={"/admin/dashboard"}
                             className={`flex items-center gap-3 rounded-lg ${isActivePage("/admin/dashboard") ? "bg-blue-600 text-white": ""} px-4 py-3 text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
@@ -28,7 +28,7 @@ export default function AdminDashboardSidebar() {
 
                     <li>
                         <Link
-                            href="/admin/internships"
+                            href={"/admin/internships"}
                             className={`flex items-center gap-3 rounded-lg ${isActivePage("/admin/internships", true) ? "bg-blue-600 text-white": ""} px-4 py-3 text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
@@ -40,19 +40,7 @@ export default function AdminDashboardSidebar() {
 
                     <li>
                         <Link
-                            href="/admin/internships/create"
-                            className={`flex items-center gap-3 rounded-lg ${isActivePage("/admin/internships/create") ? "bg-blue-600 text-white": ""} px-4 py-3 text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600`}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                            Nouveau stage
-                        </Link>
-                    </li>
-
-                    <li>
-                        <Link
-                            href="/admin/students"
+                            href={"/admin/students"}
                             className={`flex items-center gap-3 rounded-lg ${isActivePage("/admin/students") ? "bg-blue-600 text-white": ""} px-4 py-3 text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
@@ -64,7 +52,7 @@ export default function AdminDashboardSidebar() {
 
                     <li>
                         <Link
-                            href="/admin/companies"
+                            href={"/admin/companies"}
                             className={`flex items-center gap-3 rounded-lg ${isActivePage("/admin/companies") ? "bg-blue-600 text-white": ""} px-4 py-3 text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
@@ -73,11 +61,35 @@ export default function AdminDashboardSidebar() {
                             Entreprises
                         </Link>
                     </li>
+
+                    <li>
+                        <Link
+                            href={"/admin/internships/create"}
+                            className={`flex items-center gap-3 rounded-lg ${isActivePage("/admin/internships/create") ? "bg-blue-600 text-white": ""} px-4 py-3 text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Ajouter un stage
+                        </Link>
+                    </li>
+
+                    <li>
+                        <Link
+                            href={"/admin/teachers/create"}
+                            className={`flex items-center gap-3 rounded-lg ${isActivePage("/admin/teachers/create") ? "bg-blue-600 text-white": ""} px-4 py-3 text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Ajouter un professeur
+                        </Link>
+                    </li>
                 </ul>
 
                 <div className="mt-8 border-t border-gray-200 pt-4">
                     <Link
-                        href="/admin/settings"
+                        href={"/admin/settings"}
                         className="flex items-center gap-3 rounded-lg px-4 py-3 text-gray-700 transition-colors hover:bg-gray-100"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
@@ -88,7 +100,7 @@ export default function AdminDashboardSidebar() {
                     </Link>
 
                     <Link
-                        href="/logout"
+                        href={"/logout"}
                         method="post"
                         as="button"
                         className="mt-2 flex w-full items-center gap-3 rounded-lg px-4 py-3 text-red-600 transition-colors hover:bg-red-50"
