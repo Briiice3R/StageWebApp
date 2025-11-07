@@ -16,9 +16,8 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Student::query()
-            ->get();
-        
+        $students = Student::all();
+
         return Inertia::render("Admin/Students/Index", [
             "students" => $students->toArray()
         ]);
