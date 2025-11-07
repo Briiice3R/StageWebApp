@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
+use App\Models\Internship;
+use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,6 +14,13 @@ use Inertia\Response;
 
 class InternshipController extends Controller
 {
+    public function index(): Response{
+        $internships = Internship::all();
+        /** @noinspection PhpParamsInspection */
+        return Inertia::render("Admin/Internships/Index", [
+            "internships" => $internships
+        ]);
+    }
     /**
      * Show the form for creating a new resource.
      */
