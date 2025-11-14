@@ -1,15 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
-
-use App\Http\Controllers\Controller;
+namespace App\Http\Controllers;
 
 use App\Models\Internship;
-use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 use Inertia\Response;
 
 class InternshipController extends Controller
@@ -17,7 +14,7 @@ class InternshipController extends Controller
     public function index(): Response{
         $internships = Internship::all();
         /** @noinspection PhpParamsInspection */
-        return Inertia::render("Admin/Internships/Index", [
+        return Inertia::render("Internships/Index", [
             "internships" => $internships
         ]);
     }
@@ -27,7 +24,7 @@ class InternshipController extends Controller
     public function create(): Response
     {
         /** @noinspection PhpParamsInspection */
-        return Inertia::render("Admin/Internships/Create");
+        return Inertia::render("Internships/Create");
     }
 
     /**
