@@ -14,6 +14,7 @@ type FieldName =
     | 'internship.studentTask'
     | 'internship.comment'
     | 'internship.isRemote'
+    | "internship.isPaid"
     | 'supervisor.first_name'
     | 'supervisor.last_name'
     | 'supervisor.mail'
@@ -31,6 +32,7 @@ export default function CreateInternship() {
             studentTask: '',
             comment: '',
             isRemote: '',
+            isPaid: ''
         },
         teacher:{
             teacher_id: ''
@@ -78,6 +80,11 @@ export default function CreateInternship() {
             {
                 condition: (v) => !v,
                 errorMessage: 'Vous devez chosir si le stage est en télétravail.',
+            },
+        ],'internship.isPaid': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez chosir si le stage est rémunéré.',
             },
         ],
         'internship.subject': [
@@ -187,7 +194,6 @@ export default function CreateInternship() {
     return (
         <>
             <Head title="Ajouter un stage" />
-
             <main className="flex min-h-screen bg-gray-50 p-8">
                 <AdminDashboardSidebar />
                 <div className='flex-1 p-8'>
@@ -350,6 +356,42 @@ export default function CreateInternship() {
                                     </div>
                                     {getError('internship.isRemote') && (
                                         <p className="mt-1 text-sm text-red-600">{getError('internship.isRemote')}</p>
+                                    )}
+                                </div>
+                                <div className="mt-6">
+                                    <p className="mb-2 block text-sm font-medium text-gray-700">
+                                        Rémunéré <span className="text-red-500">*</span>
+                                    </p>
+                                    <div className={`flex gap-6`}>
+                                        <label htmlFor="paidYes" className="flex cursor-pointer items-center">
+                                            <input
+                                                name="isPaid"
+                                                id="paidYes"
+                                                type="radio"
+                                                value="Oui"
+                                                checked={data.internship.isPaid === 'true'}
+                                                onBlur={(e) => handleBlurField('internship.isPaid', e.target.value)}
+                                                onChange={() => setData('internship.isPaid', 'true')}
+                                                className="mr-2"
+                                            />
+                                            Oui
+                                        </label>
+                                        <label htmlFor="paidNo" className="flex cursor-pointer items-center">
+                                            <input
+                                                name="isPaid"
+                                                id="paidNo"
+                                                type="radio"
+                                                value="Non"
+                                                checked={data.internship.isPaid === 'false'}
+                                                onBlur={(e) => handleBlurField('internship.isPaid', e.target.value)}
+                                                onChange={() => setData('internship.isPaid', 'false')}
+                                                className="mr-2"
+                                            />
+                                            Non
+                                        </label>
+                                    </div>
+                                    {getError('internship.isPaid') && (
+                                        <p className="mt-1 text-sm text-red-600">{getError('internship.isPaid')}</p>
                                     )}
                                 </div>
                             </div>

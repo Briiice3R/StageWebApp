@@ -44,6 +44,7 @@ class Internship extends Model
         "start_date",
         "end_date",
         "is_remote",
+        "is_paid",
         "internship_subject",
         "student_task",
         "comment",
