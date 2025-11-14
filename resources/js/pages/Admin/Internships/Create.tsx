@@ -109,25 +109,25 @@ export default function CreateInternship() {
         'teacher.teacher_id': [
             {
                 condition: (v) => !v,
-                errorMessage: 'Vous devez sélectionner un maître de stage.',
+                errorMessage: 'Vous devez sélectionner un tuteur pédagogique.',
             },
         ],
         'supervisor.first_name': [
             {
                 condition: (v) => !v,
-                errorMessage: 'Vous devez saisir le prénom du tuteur.',
+                errorMessage: 'Vous devez saisir le prénom du tuteur de stage.',
             },
         ],
         'supervisor.last_name': [
             {
                 condition: (v) => !v,
-                errorMessage: 'Vous devez saisir le nom du tuteur.',
+                errorMessage: 'Vous devez saisir le nom du tuteur de stage.',
             },
         ],
         'supervisor.mail': [
             {
                 condition: (v) => !v,
-                errorMessage: 'Vous devez saisir le mail du tuteur.',
+                errorMessage: 'Vous devez saisir le mail du tuteur de stage.',
             },
             {
                 condition: (v) => {
@@ -140,7 +140,7 @@ export default function CreateInternship() {
         'supervisor.phone': [
             {
                 condition: (v) => !v,
-                errorMessage: 'Vous devez saisir le numéro de téléphone du tuteur.',
+                errorMessage: 'Vous devez saisir le numéro de téléphone du tuteur de stage.',
             },
             {
                 condition: (v) => {
@@ -485,7 +485,7 @@ export default function CreateInternship() {
                                     </div>
                                     <div>
                                         <label htmlFor="teacher" className="mb-2 block text-sm font-medium text-gray-700">
-                                            Maître de stage <span className="text-red-500">*</span>
+                                            Tuteur pédagogique <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             className={`w-full rounded-md border ${getError("teacher.teacher_id") ? 'border-red-500' : 'border-gray-300'} px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
@@ -511,7 +511,7 @@ export default function CreateInternship() {
                                 </div>
                             </div>
 
-                            {/* TUTEUR DE STAGE */}
+                            {/* TUTEUR D'ENTREPRISE */}
                             <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-6">
                                 <div className="mb-4 flex items-center gap-2">
                                     <svg
@@ -528,7 +528,7 @@ export default function CreateInternship() {
                                             d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"
                                         />
                                     </svg>
-                                    <h2 className="text-xl font-semibold text-gray-800">Tuteur de stage</h2>
+                                    <h2 className="text-xl font-semibold text-gray-800">Tuteur d'entreprise</h2>
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
