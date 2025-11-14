@@ -40,6 +40,7 @@ class InternshipController extends Controller
             "internship.startDate"=>["required",Rule::date()->format("d/m/Y")],
             "internship.endDate"=>["required",Rule::date()->format("d/m/Y")],
             "internship.isRemote"=>["required", "boolean:strict"],
+            "internship.isPaid"=>["required", "boolean:strict"],
             "internship.subject"=>["required", "alpha_num:ascii"],
             "internship.studentTask"=>["required", "alpha_num:ascii"],
             "internship.teacher"=>["required"],
