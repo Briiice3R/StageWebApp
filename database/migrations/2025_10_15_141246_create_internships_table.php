@@ -17,6 +17,7 @@ return new class extends Migration
             $table->date("start_date");
             $table->date("end_date");
             $table->boolean("is_remote");
+            $table->boolean("is_paid");
             $table->string("internship_subject");
             $table->string("student_task");
             $table->longText("comment")->nullable();
