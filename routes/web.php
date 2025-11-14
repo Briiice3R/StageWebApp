@@ -1,14 +1,14 @@
 <?php
-use App\Http\Controllers\Student\InternshipController as StudentInternshipController;
-use App\Http\Controllers\Admin\InternshipController as AdminInternshipController;
-use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
-use App\Http\Controllers\Admin\StudentController as StudentController;
+
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\InternshipController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeacherController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::prefix("admin")->name("admin.")->group(function(){
         Route::prefix("internships")->name("internships.")->group(function(){
-            Route::controller(AdminInternshipController::class)->group(function(){
+            Route::controller(InternshipController::class)->group(function(){
                 Route::get("/create", "create")->name("create");
                 Route::post("/", "store")->name("store");
                 Route::get("/", "index")->name("index");
@@ -22,7 +22,14 @@ Route::prefix("admin")->name("admin.")->group(function(){
         });
 
         Route::prefix("teachers")->name("teachers.")->group(function(){
-            Route::controller(AdminTeacherController::class)->group(function(){
+            Route::controller(TeacherController::class)->group(function(){
+                Route::get("/", "index")->name("index");
+                Route::get("/create", "create")->name("create");
+            });
+        });
+
+        Route::prefix("companies")->name("companies.")->group(function(){
+            Route::controller(CompanyController::class)->group(function(){
                 Route::get("/", "index")->name("index");
                 Route::get("/create", "create")->name("create");
             });

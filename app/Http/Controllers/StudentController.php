@@ -1,19 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class TeacherController extends Controller
+
+class StudentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //Inertia::render("Admin/Teachers/Index");
+        $students = Student::all();
+
+        return Inertia::render("Students/Index", [
+            "students" => $students->toArray()
+        ]);
     }
 
     /**
@@ -21,7 +26,7 @@ class TeacherController extends Controller
      */
     public function create()
     {
-        return Inertia::render("Admin/Teachers/Create");
+        //
     }
 
     /**
