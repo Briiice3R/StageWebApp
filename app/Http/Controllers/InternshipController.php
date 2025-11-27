@@ -12,11 +12,9 @@ use Inertia\Response;
 class InternshipController extends Controller
 {
     public function index(): Response{
-        $internships = Internship::all();
+        // $internships = Internship::all();
         /** @noinspection PhpParamsInspection */
-        return Inertia::render("Internships/Index", [
-            "internships" => $internships
-        ]);
+        return Inertia::render("Internships/Index");
     }
     /**
      * Show the form for creating a new resource.
