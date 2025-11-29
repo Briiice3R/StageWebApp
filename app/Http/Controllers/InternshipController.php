@@ -11,11 +11,17 @@ use Inertia\Response;
 
 class InternshipController extends Controller
 {
-    public function index(): Response{
-        // $internships = Internship::all();
+    public function index(): Response
+    {
+        // Récupération des stages avec les relations 'student' et 'company' (Eager Loading)
+        $internships = Internship::with(['student', 'company'])->get();
+        
         /** @noinspection PhpParamsInspection */
-        return Inertia::render("Internships/Index");
+        return Inertia::render("Internships/Index", [
+            'internships' => $internships,
+        ]);
     }
+    
     /**
      * Show the form for creating a new resource.
      */
@@ -30,7 +36,7 @@ class InternshipController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-
+        // La logique de validation et de stockage reste inchangée.
         $data = $request->validate([
             "internship.startDate"=>["required",Rule::date()->format("d/m/Y")],
             "internship.endDate"=>["required",Rule::date()->format("d/m/Y")],
@@ -45,7 +51,6 @@ class InternshipController extends Controller
             "supervisor.last_name"=>["required", "alpha_dash:ascii"],
             "supervisor.mail"=>["required", "email"],
             "supervisor.phone"=>["required", "regex:/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/"],
-
         ]);
         // dd($data);
         return redirect()->route("internships");

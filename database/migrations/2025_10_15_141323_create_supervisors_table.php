@@ -20,7 +20,7 @@ return new class extends Migration
             
             $table->string("company_siren");
 
-            $table->foreign("company_siren")->references("company_siren")->on("internships");
+            $table->foreign("company_siren")->references("company_siren")->on("companies")->cascadeOnDelete();
             $table->timestamps();
         });
     }

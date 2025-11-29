@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property int $id
@@ -28,6 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Supervisor extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         "first_name",
         "last_name",

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $student_id
@@ -26,9 +26,19 @@ use Illuminate\Database\Eloquent\Attributes\UseFactory;
 class Student extends Model
 {
     use HasFactory;
+    protected $primaryKey = 'student_id';
+
     protected $fillable = [
         "student_id",
         "first_name",
         "last_name"
     ];
+
+    /**
+     * Un étudiant peut avoir plusieurs stages.
+     */
+    public function internships(): HasMany
+    {
+        return $this->hasMany(Internship::class, 'student_id', 'student_id');
+    }
 }
