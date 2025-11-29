@@ -26,9 +26,10 @@ return new class extends Migration
             $table->string("teacher_id");
             $table->string("supervisor_id");
 
-            $table->foreign("student_id")->references("student_id")->on("students");
-            $table->foreign("teacher_id")->references("id")->on("teachers");
-            $table->foreign("supervisor_id")->references("id")->on("supervisors");
+            $table->foreign("student_id")->references("student_id")->on("students")->cascadeOnDelete();
+            $table->foreign("teacher_id")->references("id")->on("teachers")->cascadeOnDelete();
+            $table->foreign("supervisor_id")->references("id")->on("supervisors")->cascadeOnDelete();
+            $table->foreign('company_siren')->references('company_siren')->on('companies')->cascadeOnDelete();
 
             $table->timestamps();
         });

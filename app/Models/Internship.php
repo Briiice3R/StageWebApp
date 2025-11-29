@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -38,7 +40,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Internship extends Model
 {
-    //
+    use HasFactory;
+
     protected $fillable = [
         "company_siren",
         "start_date",
@@ -52,4 +55,20 @@ class Internship extends Model
         "teacher_id",
         "supervisor_id"
     ];
+
+    /**
+     * Relation vers l'étudiant associée à ce stage.
+     */
+    public function student(): BelongsTo
+    {
+        return $this->belongsTo(Student::class, 'student_id', 'student_id'); 
+    }
+
+    /**
+     * Relation vers l'entreprise associée à ce stage.
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'company_siren', 'company_siren');
+    }
 }
