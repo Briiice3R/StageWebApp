@@ -17,6 +17,10 @@
         "laravel/wayfinder": "^0.1.11",
         "subfission/cas": "dev-master"
     },
+    "repositories": [{
+        "type": "vcs",
+        "url": "https://github.com/DarkNatha008/privateCAS"
+    }],
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.6",
         "fakerphp/faker": "^1.23",
