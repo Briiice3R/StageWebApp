@@ -5,7 +5,6 @@ use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::prefix("admin")->name("admin.")->group(function(){
         Route::prefix("internships")->name("internships.")->group(function(){
