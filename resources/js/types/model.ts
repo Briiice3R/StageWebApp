@@ -1,10 +1,29 @@
+import { City } from '@/types/index';
+
 export interface Company{
-    siren: string;
     nom_complet: string;
     nom_raison_sociale: string;
     siege: {
         commune: string;
+        adresse: string;
+        code_postal: string;
+        siret: string;
+        isEtablissement?: boolean
+        isSiege?: boolean;
+        //Ajout qui ne provient pas de l'api
+        city?: City;
     };
+    matching_etablissements: [
+        {
+            code_postal: string;
+            commune: string;
+            adresse: string;
+            region: string;
+            siret: string;
+            is_siege: boolean;
+            city?: City;
+        }
+    ];
 }
 export interface Student{
     student_id: string;
@@ -13,7 +32,7 @@ export interface Student{
 }
 
 export interface Internship{
-    company_siren: string;
+    company_siret: string;
     start_date: Date;
     end_date: Date;
     is_remote: boolean;

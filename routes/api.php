@@ -18,3 +18,4 @@ Route::prefix("admin")->group(function (){
     Route::get("companies", [ApiCompanyController::class, "index"]);
 
 });
+http://localhost:8000/api/admin/companies?q=24545454

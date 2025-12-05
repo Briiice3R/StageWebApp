@@ -56,6 +56,7 @@ class InternshipController extends Controller
         return redirect()->route("internships");
     }
 
+
     /**
      * Display the specified resource.
      */

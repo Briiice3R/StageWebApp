@@ -6,7 +6,7 @@ import { Company } from '@/types/model';
 
 
 
-type FieldName = 'company.siren';
+type FieldName = 'company.siret';
 
 type CompanySearchInputProps = {
     onCompanySelect: (company: Company) => void;
@@ -20,7 +20,9 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
         data, setData,
         selected, setSelected,
         apiError, setApiError,
-        isLoading} = useAutoComplete<Company>(
+        isLoading
+    }
+    = useAutoComplete<Company>(
         companyHandler.getCompanyByText,
         3,
         800
@@ -29,7 +31,7 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
     return (
         <Field className="w-full" id="companies">
             <Label className="mb-2 block text-sm font-medium text-gray-700">
-                Nom de l'entreprise / SIREN <span className="text-red-500">*</span>
+                Nom de l'entreprise / SIRET <span className="text-red-500">*</span>
             </Label>
             <Combobox
                 value={selected}
@@ -45,7 +47,7 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
             >
                 <div className="relative">
                     <ComboboxInput
-                        displayValue={(c: Company | null) => (c ? `${c.nom_complet} (${c.siren})` : '')}
+                        displayValue={(c: Company | null) => (c ? `${c.nom_complet} (${c.siege.siret})` : '')}
                         className={`w-full rounded-md border px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 ${
                             error ? 'border-red-500' : 'border-gray-300'
                         }`}
@@ -55,12 +57,12 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
                         }}
                         onBlur={() => {
                             if (selected) {
-                                onBlurEffect('company.siren', selected.siren);
+                                onBlurEffect('company.siret', selected.siege.siret);
                             } else {
-                                onBlurEffect('company.siren', '');
+                                onBlurEffect('company.siret', '');
                             }
                         }}
-                        placeholder="Recherchez une entreprise par nom ou SIREN (min. 3 caractères)"
+                        placeholder="Recherchez une entreprise par nom ou SIRET (min. 3 caractères)"
                         aria-invalid={error ? 'true' : 'false'}
                         aria-describedby={error ? 'company-error' : undefined}
                     />
@@ -86,13 +88,13 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
                                         className={({ focus }) =>
                                             `${focus ? 'bg-blue-50' : 'bg-white even:bg-gray-50'} relative cursor-pointer select-none px-4 py-3 transition-colors hover:bg-blue-100`
                                         }
-                                        key={c.siren}
+                                        key={c.siege.siret}
                                         value={c}
                                     >
                                         <div>
                                             <div className="mb-1 font-semibold text-gray-900">{c.nom_complet}</div>
                                             <div className="text-xs text-gray-600">
-                                                <span className="font-medium">SIREN :</span> {c.siren}
+                                                <span className="font-medium">SIRET :</span> {c.siege.siret}
                                             </div>
                                             <div className="text-xs text-gray-600">
                                                 <span className="font-medium">Ville :</span> {c.siege.commune || 'Inconnue'}

@@ -12,20 +12,22 @@ class CompanyController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        if (!$request->has("q")) {
+        if (empty($request->query())) {
             return response()->json([
                 "data" => []
             ], 400);
         }
         try{
-            $companies = Http::withoutVerifying()->get("https://recherche-entreprises.api.gouv.fr/search?q=" . urlencode($request->query("q")));
+
+            $companies = Http::withoutVerifying()->get("https://recherche-entreprises.api.gouv.fr/search?" . $request->getQueryString());
             if ($companies->failed()) {
                 return response()->json([
                     "data" => []
                 ], 501);
             }
             return response()->json([
-                "data" => $companies->json("results")
+                "data" => $companies->json("results"),
+                "total_pages" => $companies->json("total_pages")
             ]);
         } catch (ConnectionException $e){
             return response()->json([

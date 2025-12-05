@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-
 export function useAutoComplete<T>(
     fetchFunction: (query:string, signal?:AbortSignal)=>Promise<any>,
     minChars: number=0,
