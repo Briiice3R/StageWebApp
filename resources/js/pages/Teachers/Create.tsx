@@ -1,7 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
 import AdminDashboardSidebar from '@/components/AdminDashboardSidebar';
-import {Teacher} from "@/types/model";
-import { useState } from 'react';
 import { useValidation } from '@/hooks/useValidation';
 import { ValidationRules } from '@/types';
 

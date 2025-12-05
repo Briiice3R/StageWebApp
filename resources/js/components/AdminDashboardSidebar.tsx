@@ -52,7 +52,7 @@ export default function AdminDashboardSidebar() {
 
                     <li>
                         <Link
-                            href={"/admin/companies"}
+                            href={"/companies"}
                             className={`flex items-center gap-3 rounded-lg ${isActivePage("/admin/companies") ? "bg-blue-600 text-white": ""} px-4 py-3 text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
