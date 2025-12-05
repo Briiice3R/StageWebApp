@@ -56,3 +56,35 @@ export interface Region {
 export interface GeoApiResponse<T> {
     data: T[];
 }
+
+export interface NafSection{
+    id: string;
+    libelle: string;
+}
+export interface NafActivity {
+    id: string;
+    label: string;
+}
+
+
+export interface City {
+    nom: string;
+    code: string;
+    codeDepartement: string;
+    codesPostaux: string[];
+    codeRegion: string;
+}
+
+export interface Department {
+    nom: string;
+    code: string;
+}
+
+export interface Region {
+    nom: string;
+    code: string;
+}
+
+export interface GeoApiResponse<T> {
+    data: T[];
+}
