@@ -1,5 +1,10 @@
 import AdminDashboardSidebar from '@/components/AdminDashboardSidebar';
-import { Head } from '@inertiajs/react';
+import CompanySearchInput from '@/components/CompanySearchInput';
+import { Head, useForm } from '@inertiajs/react';
+import { FormEventHandler } from 'react';
+import {ValidationRules} from '@/types';
+import { useValidation } from '@/hooks/useValidation';
+
 
 // ====================================================================
 // SECTION TYPES
@@ -32,6 +37,74 @@ type Internship = {
     is_remote: boolean;
 };
 
+type FieldName =
+    | 'company.siren'
+    | 'internship.subject'
+    | "internship.isPaid"
+
+const { data, setData, post, processing, errors, reset, transform } = useForm({
+        internship: {
+            subject: '',
+            isPaid: ''
+        },
+        company: {
+            siren: '',
+        },
+    });
+    const rules: Partial<Record<FieldName, ValidationRules[]>> = {
+        'company.siren': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez sélectionner une entreprise.',
+            },
+        ],
+        'internship.isPaid': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez chosir si le stage est rémunéré.',
+            },
+        ],
+        'internship.subject': [
+            {
+                condition: (v) => !v,
+                errorMessage: 'Vous devez saisir un sujet de stage.',
+            },
+            {
+                condition: (v) => v.length < 10,
+                errorMessage: 'Le sujet doit faire au moins 10 caractères.',
+            },
+        ],
+    };
+    const handleSubmit: FormEventHandler = (e) => {
+        const isValidate:boolean = validate(e);
+        if(isValidate){
+            transform((data) => ({
+                ...data,
+                internship: {
+                    ...data.internship,
+                    startDate: new Date(data.internship.startDate).toLocaleString('fr-FR').split(' ')[0],
+                    endDate: new Date(data.internship.endDate).toLocaleString('fr-FR').split(' ')[0],
+                },
+            }));
+            post('/admin/internships', {
+                onSuccess: () => {
+                    reset();
+                    setFrontErrors({});
+                    setHasTouched({});
+                },
+                onError: (errors) => {
+                    console.error('Erreurs de validation backend:', errors);
+                },
+            });
+        }
+    };
+
+    const {getError, validate, handleBlurField, setFrontErrors, setHasTouched} = useValidation(
+            errors,
+            rules,
+            data
+
+        );
 
 // ====================================================================
 // COMPOSANT PRINCIPAL (InternshipsIndex)
@@ -73,7 +146,44 @@ export default function InternshipsIndex({ internships }: InternshipsProps){
                         <div className="mb-6 rounded-lg bg-white p-6 shadow-md border-b border-gray-200">
                             <h3 className="text-xl font-bold mb-3 text-gray-800">Filtrer les stages</h3>
                             <p className="text-sm text-gray-500">
-                                "Filtres"
+                                <form onSubmit={handleSubmit}>
+                                    {/* ENTREPRISE */}
+                                    <div className="mb-8">
+                                        <div className="mb-4 flex items-center gap-2">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={1.5}
+                                                stroke="currentColor"
+                                                className="h-6 w-6 text-blue-600"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"
+                                                />
+                                            </svg>
+                                            <h2 className="text-xl font-semibold text-gray-800">Entreprise</h2>
+                                        </div>
+                                        <CompanySearchInput
+                                            onCompanySelect={(company) => {
+                                                setData('company', {
+                                                    siren: company.siren,
+                                                });
+                                            }}
+                                            onBlurEffect={(fieldName, value) => handleBlurField(fieldName, value)}
+                                            error={getError('company.siren')}
+                                        />
+                                        {getError('company.siren') && <p className="mt-1 text-sm text-red-600">{getError('company.siren')}</p>}
+                                    </div>
+                                </form>
+                                <button className="flex flex-1 items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-4 w-4">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                    </svg>Rémunératation : Oui
+                                </button>
                             </p>
                         </div>
 
