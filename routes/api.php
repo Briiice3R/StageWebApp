@@ -16,5 +16,6 @@ Route::prefix("admin")->group(function (){
     Route::get("students/search", [ApiStudentController::class, "search"]);
 
     Route::get("companies", [ApiCompanyController::class, "index"]);
+    Route::get("detailcompany", [ApiCompanyController::class, "index"]);
 
 });

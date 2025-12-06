@@ -4,6 +4,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\DetailCompanyController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("admin")->name("admin.")->group(function(){
@@ -25,6 +26,13 @@ Route::prefix("admin")->name("admin.")->group(function(){
             Route::controller(TeacherController::class)->group(function(){
                 Route::get("/", "index")->name("index");
                 Route::get("/create", "create")->name("create");
+            });
+        });
+
+        Route::prefix("detailcompany")->name("detailcompany.")->group(function(){
+            Route::controller(DetailCompanyController::class)->group(function(){
+                Route::get("/", "index")->name("index");
+                Route::get("/{siret}", "show")->name("show");
             });
         });
 
