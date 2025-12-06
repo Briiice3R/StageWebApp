@@ -1,0 +1,86 @@
+[
+  {
+    "id": "A",
+    "libelle": "Agriculture, sylviculture et pêche"
+  },
+  {
+    "id": "B",
+    "libelle": "Industries extractives"
+  },
+  {
+    "id": "C",
+    "libelle": "Industrie manufacturière"
+  },
+  {
+    "id": "D",
+    "libelle": "Production et distribution d'électricité, de gaz, de vapeur et d'air conditionné"
+  },
+  {
+    "id": "E",
+    "libelle": "Production et distribution d'eau; assainissement, gestion des déchets et dépollution"
+  },
+  {
+    "id": "F",
+    "libelle": "Construction"
+  },
+  {
+    "id": "G",
+    "libelle": "Commerce; réparation d'automobiles et de motocycles"
+  },
+  {
+    "id": "H",
+    "libelle": "Transports et entreposage"
+  },
+  {
+    "id": "I",
+    "libelle": "Hébergement et restauration"
+  },
+  {
+    "id": "J",
+    "libelle": "Information et communication"
+  },
+  {
+    "id": "K",
+    "libelle": "Activités financières et d'assurance"
+  },
+  {
+    "id": "L",
+    "libelle": "Activités immobilières"
+  },
+  {
+    "id": "M",
+    "libelle": "Activités spécialisées, scientifiques et techniques"
+  },
+  {
+    "id": "N",
+    "libelle": "Activités de services administratifs et de soutien"
+  },
+  {
+    "id": "O",
+    "libelle": "Administration publique"
+  },
+  {
+    "id": "P",
+    "libelle": "Enseignement"
+  },
+  {
+    "id": "Q",
+    "libelle": "Santé humaine et action sociale"
+  },
+  {
+    "id": "R",
+    "libelle": "Arts, spectacles et activités récréatives"
+  },
+  {
+    "id": "S",
+    "libelle": "Autres activités de services"
+  },
+  {
+    "id": "T",
+    "libelle": "Activités des ménages en tant qu'employeurs; activités indifférenciées des ménages en tant que producteurs de biens et services pour usage propre"
+  },
+  {
+    "id": "U",
+    "libelle": "Activités extra-territoriales"
+  }
+]
