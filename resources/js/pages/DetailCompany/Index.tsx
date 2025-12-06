@@ -108,11 +108,11 @@ export default function DetailCompany({ company, error, siret, internship_count 
                             {company.matching_etablissements && company.matching_etablissements.length > 0 && (
                             <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <h3 className="font-medium text-gray-700">SIREN</h3>
+                                    <h2 className="text-xl font-semibold text-gray-800">SIREN</h2>
                                     <p>{company.siren || 'Non renseigné'}</p>
                                 </div>
                                 <div>
-                                    <h3 className="font-medium text-gray-700">SIRET</h3>
+                                    <h2 className="text-xl font-semibold text-gray-800">SIRET</h2>
                                     {company.matching_etablissements.map((etab, idx) => (
                                             <p key={idx}>{etab.siret || 'Non renseignée'}</p>
                                         ))}
