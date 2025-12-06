@@ -39,8 +39,7 @@ Route::prefix("admin")->name("admin.")->group(function(){
         Route::prefix("detailcompany")->name("detailcompany.")->group(function(){
             Route::controller(DetailCompanyController::class)->group(function(){
                 Route::get("/", "index")->name("index");
+                Route::get("/{siret}", "show")->name("show");
             });
         });
-        
-
 });
