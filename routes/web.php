@@ -5,6 +5,14 @@ use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use Illuminate\Support\Facades\Route;
+use Subfission\Cas\Middleware\CASAuth;
+
+Route::get('/', function () {
+    $user = cas()->user();
+    $attributes = cas()->getAttributes();
+    return view('CAS', compact('user', 'attributes'));
+})->middleware(CASAuth::class);
+
 
 Route::prefix("admin")->name("admin.")->group(function(){
         Route::prefix("internships")->name("internships.")->group(function(){

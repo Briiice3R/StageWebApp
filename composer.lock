@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a950a1598507a74a90356292d290313",
+    "content-hash": "f69c843eecd92a8c8b6a104db9e4cc33",
     "packages": [
         {
             "name": "apereo/phpcas",
@@ -3603,16 +3603,16 @@
         },
         {
             "name": "subfission/cas",
-            "version": "dev-master",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DarkNatha008/cas.git",
-                "reference": "1e467a22a4838d3e1d9949e0b2ca06fe5873ad76"
+                "url": "git@github.com:DarkNatha008/privateCAS.git",
+                "reference": "c2bb6b515564861c663e9bc581c08ba92e2c6ede"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DarkNatha008/cas/zipball/1e467a22a4838d3e1d9949e0b2ca06fe5873ad76",
-                "reference": "1e467a22a4838d3e1d9949e0b2ca06fe5873ad76",
+                "url": "https://api.github.com/repos/DarkNatha008/privateCAS/zipball/c2bb6b515564861c663e9bc581c08ba92e2c6ede",
+                "reference": "c2bb6b515564861c663e9bc581c08ba92e2c6ede",
                 "shasum": ""
             },
             "require": {
@@ -3672,9 +3672,10 @@
                 "phpCAS"
             ],
             "support": {
-                "source": "https://github.com/DarkNatha008/cas/tree/master"
+                "source": "https://github.com/DarkNatha008/privateCAS/tree/main",
+                "issues": "https://github.com/DarkNatha008/privateCAS/issues"
             },
-            "time": "2025-12-04T11:29:34+00:00"
+            "time": "2025-12-04T12:27:22+00:00"
         },
         {
             "name": "symfony/clock",
