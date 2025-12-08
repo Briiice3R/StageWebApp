@@ -6,69 +6,78 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * @property int $id
- * @property string $company_siren
- * @property string $start_date
- * @property string $end_date
- * @property int $is_remote
- * @property string $internship_subject
- * @property string $student_task
- * @property string|null $comment
- * @property string $student_id
- * @property string $teacher_id
- * @property string $supervisor_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereComment($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereCompanySiren($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereEndDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereInternshipSubject($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereIsRemote($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereStartDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereStudentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereStudentTask($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereSupervisorId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereTeacherId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Internship whereUpdatedAt($value)
- * @mixin \Eloquent
- */
 class Internship extends Model
 {
     use HasFactory;
 
+    /**
+     * La table associée au modèle.
+     */
+    protected $table = 'internships';
+
+    /**
+     * La clé primaire de la table.
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * Indique si la clé primaire est auto-incrémentée.
+     */
+    public $incrementing = true;
+
+    /**
+     * Le type de la clé primaire.
+     */
+    protected $keyType = 'int';
+
+    /**
+     * Les attributs qui peuvent être assignés en masse.
+     */
     protected $fillable = [
-        "company_siren",
-        "start_date",
-        "end_date",
-        "is_remote",
-        "is_paid",
-        "internship_subject",
-        "student_task",
-        "comment",
-        "student_id",
-        "teacher_id",
-        "supervisor_id"
+        'company_siret',
+        'start_date',
+        'end_date',
+        'is_remote',
+        'is_paid',
+        'internship_subject',
+        'student_task',
+        'comment',
+        'student_id',
+        'teacher_id',
+        'supervisor_id',
     ];
 
     /**
-     * Relation vers l'étudiant associée à ce stage.
+     * Les attributs qui doivent être castés.
+     */
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'is_remote' => 'boolean',
+        'is_paid' => 'boolean',
+    ];
+
+    /**
+     * Relation avec le modèle Student
      */
     public function student(): BelongsTo
     {
-        return $this->belongsTo(Student::class, 'student_id', 'student_id'); 
+        return $this->belongsTo(Student::class, 'student_id', 'student_id');
     }
 
     /**
-     * Relation vers l'entreprise associée à ce stage.
+     * Relation avec le modèle Teacher
      */
-    public function company(): BelongsTo
+    public function teacher(): BelongsTo
     {
-        return $this->belongsTo(Company::class, 'company_siren', 'company_siren');
+        return $this->belongsTo(Teacher::class, 'teacher_id', 'id');
+    }
+
+    /**
+     * Relation avec le modèle Supervisor
+     */
+    public function supervisor(): BelongsTo
+    {
+        return $this->belongsTo(Supervisor::class, 'supervisor_id', 'id');
     }
 }

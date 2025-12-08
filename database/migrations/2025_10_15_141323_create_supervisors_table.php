@@ -17,10 +17,12 @@ return new class extends Migration
             $table->string("last_name");
             $table->string("mail")->nullable();
             $table->string("phone")->nullable();
-            
-            $table->string("company_siren");
 
-            $table->foreign("company_siren")->references("company_siren")->on("companies")->cascadeOnDelete();
+            $table->string("company_siret");
+            $table->string("internship_id");
+
+            $table->foreign("company_siret")->references("company_siret")->on("internships")->cascadeOnDelete();
+            $table->foreign("internship_id")->references("id")->on("internships")->cascadeOnDelete();
             $table->timestamps();
         });
     }

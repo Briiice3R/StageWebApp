@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $last_name
  * @property string|null $mail
  * @property string|null $phone
- * @property string $company_siren
+ * @property string $company_siret
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor newModelQuery()
@@ -36,6 +36,6 @@ class Supervisor extends Model
         "last_name",
         "mail",
         "phone",
-        "company_siren"
+        "company_siret"
     ];
 }

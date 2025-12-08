@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('internships', function (Blueprint $table) {
             $table->id();
-            $table->string("company_siren");
+            $table->string("company_siret");
             $table->date("start_date");
             $table->date("end_date");
             $table->boolean("is_remote");
@@ -29,7 +29,6 @@ return new class extends Migration
             $table->foreign("student_id")->references("student_id")->on("students")->cascadeOnDelete();
             $table->foreign("teacher_id")->references("id")->on("teachers")->cascadeOnDelete();
             $table->foreign("supervisor_id")->references("id")->on("supervisors")->cascadeOnDelete();
-            $table->foreign('company_siren')->references('company_siren')->on('companies')->cascadeOnDelete();
 
             $table->timestamps();
         });
