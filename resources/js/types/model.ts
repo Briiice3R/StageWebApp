@@ -39,6 +39,7 @@ export interface Student{
 }
 
 export interface Internship{
+    id?: number;
     company_siret: string;
     start_date: Date;
     end_date: Date;
@@ -49,6 +50,7 @@ export interface Internship{
     student_id: string;
     teacher_id: string;
     supervisor_id: string;
+    is_paid: boolean;
 }
 
 export interface Teacher{

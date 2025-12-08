@@ -7,7 +7,7 @@ import { useValidation } from '@/hooks/useValidation';
 import {ValidationRules} from '@/types';
 
 type FieldName =
-    | 'company.siren'
+    | 'company.siret'
     | 'internship.startDate'
     | 'internship.endDate'
     | 'internship.subject'
@@ -41,7 +41,7 @@ export default function CreateInternship() {
             student_id: '',
         },
         company: {
-            siren: '',
+            siret: '',
         },
         supervisor: {
             first_name: '',
@@ -51,7 +51,7 @@ export default function CreateInternship() {
         },
     });
     const rules: Partial<Record<FieldName, ValidationRules[]>> = {
-        'company.siren': [
+        'company.siret': [
             {
                 condition: (v) => !v,
                 errorMessage: 'Vous devez sélectionner une entreprise.',
@@ -239,13 +239,13 @@ export default function CreateInternship() {
                                 <CompanySearchInput
                                     onCompanySelect={(company) => {
                                         setData('company', {
-                                            siren: company.siren,
+                                            siret: company.siege.siret,
                                         });
                                     }}
                                     onBlurEffect={(fieldName, value) => handleBlurField(fieldName, value)}
-                                    error={getError('company.siren')}
+                                    error={getError('company.siret')}
                                 />
-                                {getError('company.siren') && <p className="mt-1 text-sm text-red-600">{getError('company.siren')}</p>}
+                                {getError('company.siret') && <p className="mt-1 text-sm text-red-600">{getError('company.siret')}</p>}
                             </div>
 
                             {/* PÉRIODE DU STAGE */}
