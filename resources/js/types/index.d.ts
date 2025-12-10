@@ -34,6 +34,14 @@ export interface NafActivity {
     label: string;
 }
 
+export interface SizeSection{
+    id: string;
+    libelle: string;
+}
+export interface SizeActivity {
+    id: string;
+    label: string;
+}
 
 export interface City {
     nom: string;
@@ -62,6 +70,16 @@ export interface NafSection{
     libelle: string;
 }
 export interface NafActivity {
+    id: string;
+    label: string;
+}
+
+
+export interface SizeSection{
+    id: string;
+    libelle: string;
+}
+export interface SizeActivity {
     id: string;
     label: string;
 }

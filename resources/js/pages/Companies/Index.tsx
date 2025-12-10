@@ -1,6 +1,7 @@
 import LocationSearchBar from '@/components/LocationSearchBar';
 import NafActivityFilter from '@/components/NafActivityFilter';
-import { City, Department, NafSection, Region } from '@/types';
+import SizeFilter from '@/components/SizeFilter';
+import { City, Department, NafSection, Region, SizeSection } from '@/types';
 import { Company } from '@/types/model';
 import companyHandler from '@/utils/companyHandler';
 import locationHandler from '@/utils/locationHandler';
@@ -26,6 +27,9 @@ export default function CompaniesPage() {
 
     // État pour les filtres NAF (optionnel - multiple)
     const [nafFilters, setNafFilters] = useState<NafSection[]>([]);
+
+    // État pour les filtres Taille (optionnel - multiple)
+    const [sizeFilters, setSizeFilters] = useState<SizeSection[]>([]);
 
     // États pour les résultats
     const [companies, setCompanies] = useState<Company[]>([]);
@@ -274,6 +278,9 @@ export default function CompaniesPage() {
 
                             {/* Filtre NAF */}
                             <NafActivityFilter onSectionsChange={setNafFilters} />
+
+                            {/* Filtre taille */}
+                            <SizeFilter onSectionsChange={setSizeFilters} />
                         </div>
                     </div>
 
