@@ -5,6 +5,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 import { useValidation } from '@/hooks/useValidation';
 import {ValidationRules} from '@/types';
+import TeacherSearchInput from '@/components/TeacherSearchInput';
 
 type FieldName =
     | 'company.siret'
@@ -178,6 +179,7 @@ export default function CreateInternship() {
                 },
             }));
             post('/admin/internships', {
+                preserveState: true,
                 onSuccess: () => {
                     reset();
                     setFrontErrors({});
@@ -526,28 +528,17 @@ export default function CreateInternship() {
                                         )}
                                     </div>
                                     <div>
-                                        <label htmlFor="teacher" className="mb-2 block text-sm font-medium text-gray-700">
-                                            Tuteur pédagogique <span className="text-red-500">*</span>
-                                        </label>
-                                        <input
-                                            className={`w-full rounded-md border ${getError("teacher.teacher_id") ? 'border-red-500' : 'border-gray-300'} px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500`}
-                                            id="teacher"
-                                            type="text"
-                                            value={data.teacher.teacher_id}
-                                            onChange={(e) =>
+                                        <TeacherSearchInput
+                                            onTeacherSelect={(teacher) => {
                                                 setData('teacher', {
-                                                    teacher_id: e.target.value,
-                                                })
-                                            }
-                                            onBlur={(e) => handleBlurField('teacher.teacher_id', e.target.value)}
-                                            aria-invalid={getError("teacher.teacher_id") ? 'true' : 'false'}
-                                            aria-describedby={getError("teacher.teacher_id") ? 'teacher-error' : undefined}
-                                            placeholder="Nom et prénom du maître de stage"
+                                                    teacher_id: teacher.teacher_id,
+                                                });
+                                            }}
+                                            onBlurEffect={(fieldName, value) => handleBlurField(fieldName, value)}
+                                            error={getError('teacher.teacher_id')}
                                         />
-                                        {getError("teacher.teacher_id") && (
-                                            <p id="teacher-error" className="mt-1 text-sm text-red-600">
-                                                {getError("teacher.teacher_id")}
-                                            </p>
+                                        {getError('teacher.teacher_id') && (
+                                            <p className="mt-1 text-sm text-red-600">{getError('teacher.teacher_id')}</p>
                                         )}
                                     </div>
                                 </div>

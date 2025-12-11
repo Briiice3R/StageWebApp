@@ -43,7 +43,6 @@ class InternshipController extends Controller
 
             return $internship;
         });
-
         return Inertia::render("Internships/Index", [
             'internships' => $internships,
         ]);
@@ -62,6 +61,24 @@ class InternshipController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $requestData = $request->all();
+
+        // ...
+
+// 1. Gérer isRemote
+        if (isset($requestData['internship']['isRemote'])) {
+            $isRemoteBool = filter_var($requestData['internship']['isRemote'], FILTER_VALIDATE_BOOLEAN);
+            $request->merge(['internship.isRemote' => $isRemoteBool]);
+        }
+
+// 2. Gérer isPaid
+        if (isset($requestData['internship']['isPaid'])) {
+            $isPaidBool = filter_var($requestData['internship']['isPaid'], FILTER_VALIDATE_BOOLEAN);
+            $request->merge(['internship.isPaid' => $isPaidBool]);
+        }
+
+// ... Le reste du code ne change pas
+
         $data = $request->validate([
             "internship.startDate" => ["required", "date_format:d/m/Y"],
             "internship.endDate" => ["required", "date_format:d/m/Y", "after:internship.startDate"],
@@ -70,7 +87,7 @@ class InternshipController extends Controller
             "internship.subject" => ["required", "string", "max:255"],
             "internship.studentTask" => ["required", "string", "max:255"],
             "internship.comment" => ["nullable", "string"],
-            "internship.teacher" => ["required", "exists:teachers,id"],
+            "teacher.teacher_id" => ["required", "exists:teachers,teacher_id"],
             "student.student_id" => ["required", "exists:students,student_id"],
             "company.siret" => ["required", "regex:/^\d{14}$/"], // ✅ SIRET = 14 chiffres, pas 9
             "supervisor.first_name" => ["required", "string", "max:255"],
@@ -99,12 +116,12 @@ class InternshipController extends Controller
             "student_task" => $data["internship"]["studentTask"],
             "comment" => $data["internship"]["comment"] ?? null,
             "student_id" => $data["student"]["student_id"],
-            "teacher_id" => $data["internship"]["teacher"],
+            "teacher_id" => $data["teacher"]["teacher_id"],
             "supervisor_id" => $supervisor->id,
         ]);
 
         // ✅ Redirection au lieu de render
-        return redirect()->route('internships.index')
+        return redirect()->route('admin.internships.index')
             ->with('success', 'Stage enregistré avec succès !');
     }
 

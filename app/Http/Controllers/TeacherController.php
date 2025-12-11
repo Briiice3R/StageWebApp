@@ -39,10 +39,10 @@ class TeacherController extends Controller
         Teacher::create([
             'first_name' => $data['teacher']['firstname'],
             'last_name' => $data['teacher']['lastname'],
-            'email' => $data['teacher']['email'],
+            'mail' => $data['teacher']['email'],
         ]);
 
-        return redirect()->route('teachers.index')
+        return redirect()->route('admin.internships.create')
             ->with('success', 'Professeur créé avec succès !');
     }
 
