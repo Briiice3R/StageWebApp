@@ -1,5 +1,6 @@
 import AdminDashboardSidebar from '@/components/AdminDashboardSidebar';
-import { Head } from '@inertiajs/react';
+import StudentNavbar from '@/components/StudentNavbar';
+import { Head, usePage } from '@inertiajs/react';
 import { Company } from '@/types/model';
 import nafData from '@/data/naf.json';
 import { NafActivity } from '@/types';
@@ -7,6 +8,8 @@ import { useEffect, useState } from 'react';
 import locationHandler from '@/utils/locationHandler';
 
 export default function DetailCompaniesPage({ company:initialCompany }: { company: Company }) {
+    const { url } = usePage();
+    const isAdmin = url.startsWith('/admin');
     const [company, setCompany] = useState(initialCompany);
     const getNafLabel = (nafId: string): string=>{
         const section = (nafData as NafActivity[]).find(
@@ -53,10 +56,13 @@ export default function DetailCompaniesPage({ company:initialCompany }: { compan
     return (
         <>
             <Head title="Informations sur l'entreprise" />
-            <main className="flex min-h-screen bg-gray-50 p-8">
-                <AdminDashboardSidebar />
 
-                <div className="mx-auto w-full max-w-7xl rounded-lg bg-white p-8 shadow-md">
+            {!isAdmin && <StudentNavbar />}
+
+            <main className={`min-h-screen bg-gray-50 ${isAdmin ? 'flex p-8' : ''}`}>
+                {isAdmin && <AdminDashboardSidebar />}
+
+                <div className={`${isAdmin ? 'mx-auto w-full max-w-7xl' : 'mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'} rounded-lg bg-white p-8 shadow-md`}>
                     {/* Header */}
                     <div className="mb-8 flex items-center gap-3 border-b border-gray-200 pb-4">
                         <svg

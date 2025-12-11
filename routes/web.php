@@ -19,6 +19,7 @@ Route::prefix("admin")->name("admin.")->group(function(){
         Route::prefix("students")->name("students.")->group(function(){
            Route::controller(StudentController::class)->group(function(){
                 Route::get("/", "index")->name("index");
+                Route::get("/{student_id}/internships", "internships")->name("internships");
            });
         });
 
@@ -36,5 +37,17 @@ Route::prefix("companies")->name("companies.")->group(function(){
     Route::controller(CompanyController::class)->group(function(){
         Route::get("/", "index")->name("index");
         Route::get("/{siret}", "show")->name("show");
+    });
+});
+
+Route::prefix("student")->name("student.")->group(function(){
+    Route::get("/", function(){
+        return \Inertia\Inertia::render("StudentHome/Index");
+    })->name("home");
+
+    Route::prefix("companies")->name("companies.")->group(function(){
+        Route::controller(CompanyController::class)->group(function(){
+            Route::get("/", "studentIndex")->name("index");
+        });
     });
 });
