@@ -4,10 +4,10 @@ namespace Database\Factories;
 
 use App\Models\Internship;
 use App\Models\Student;
-use App\Models\Company;
 use App\Models\Teacher;
 use App\Models\Supervisor;
 use Illuminate\Database\Eloquent\Factories\Factory;
+
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Internship>
@@ -34,7 +34,6 @@ class InternshipFactory extends Factory
 
         return [
             'student_id' => Student::factory(), // Crée et lie un nouvel étudiant via son ID (colonne student_id)
-            'company_siren' => Company::factory(), // Crée et lie une nouvelle entreprise via son ID (colonne company_siren)
             'teacher_id' => Teacher::factory(), // Crée et lie un nouveau professeur via son ID (colonne teacher_id)
             'supervisor_id' => Supervisor::factory(), // Crée et lie un nouveau superviseur via son ID (colonne supervisor_id)
 
@@ -47,6 +46,7 @@ class InternshipFactory extends Factory
                 'Cybersécurité et Réseaux',
                 'Marketing Digital et SEO',
             ]),
+            "company_siret" => fake()->numerify('##############'), // Génère un SIRET de 14 chiffres
             'student_task' => fake()->paragraphs(3,true),
             'is_paid' => fake()->boolean(80), // 80% de chance d'être payé
             'start_date' => $startDate->format('Y-m-d'),

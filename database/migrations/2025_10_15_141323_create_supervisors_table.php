@@ -19,10 +19,7 @@ return new class extends Migration
             $table->string("phone")->nullable();
 
             $table->string("company_siret");
-            $table->string("internship_id");
 
-            $table->foreign("company_siret")->references("company_siret")->on("internships")->cascadeOnDelete();
-            $table->foreign("internship_id")->references("id")->on("internships")->cascadeOnDelete();
             $table->timestamps();
         });
     }

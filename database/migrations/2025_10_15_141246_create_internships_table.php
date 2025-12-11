@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string("supervisor_id");
 
             $table->foreign("student_id")->references("student_id")->on("students")->cascadeOnDelete();
-            $table->foreign("teacher_id")->references("id")->on("teachers")->cascadeOnDelete();
+            $table->foreign("teacher_id")->references("teacher_id")->on("teachers")->cascadeOnDelete();
             $table->foreign("supervisor_id")->references("id")->on("supervisors")->cascadeOnDelete();
 
             $table->timestamps();

@@ -28,6 +28,8 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
         800
     );
 
+
+
     return (
         <Field className="w-full" id="companies">
             <Label className="mb-2 block text-sm font-medium text-gray-700">
@@ -52,7 +54,7 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
                             error ? 'border-red-500' : 'border-gray-300'
                         }`}
                         onChange={(e) => {
-                            setQuery(e.target.value);
+                            setQuery(`?q=${e.target.value}`);
                             setSelected(null);
                         }}
                         onBlur={() => {
@@ -97,7 +99,7 @@ export default function CompanySearchInput({ onCompanySelect, error, onBlurEffec
                                                 <span className="font-medium">SIRET :</span> {c.siege.siret}
                                             </div>
                                             <div className="text-xs text-gray-600">
-                                                <span className="font-medium">Ville :</span> {c.siege.commune || 'Inconnue'}
+                                                <span className="font-medium">Ville :</span> {c.siege.city?.nom || 'Inconnue'} ({c.siege.code_postal})
                                             </div>
                                         </div>
                                     </ComboboxOption>

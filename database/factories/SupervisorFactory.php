@@ -30,7 +30,7 @@ class SupervisorFactory extends Factory
             'last_name' => fake()->lastName(),
             'mail' => fake()->unique()->safeEmail(),
             'phone' => fake()->numerify('0# ## ## ## ##'),
-            'company_siren' => Company::factory(), 
+            'company_siret' => fake()->numerify('##############'), // Génère un SIRET de 14 chiffres
         ];
     }
 }
