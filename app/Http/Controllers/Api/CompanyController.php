@@ -20,6 +20,7 @@ class CompanyController extends Controller
             'departement' => 'nullable|string',
             'region' => 'nullable|string',
             'section_activite_principale' => 'nullable|string',
+            'tranche_effectif_salarie' => 'nullable|string',
             'page' => 'nullable|integer|min:1',
         ]);
         $result = $this->companyService->search($validated);

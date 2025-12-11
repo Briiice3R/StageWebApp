@@ -44,7 +44,7 @@ export default function CompaniesPage() {
 
     const fetchCompanies = useCallback(async (pageNumber: number=1, append:boolean=false, signal?:AbortController) => {
         // Ne rien faire si pas de recherche
-        if (!searchQuery.trim() && locationFilter === null && nafFilters.length === 0) {
+        if (!searchQuery.trim() && locationFilter === null && nafFilters.length === 0 && sizeFilters.length === 0) {
             setCompanies([]);
             setCompaniesError('');
             return;
@@ -145,7 +145,7 @@ export default function CompaniesPage() {
             setIsLoadingCompanies(false);
             setIsLoadingMore(false);
         }
-    },  [searchQuery, locationFilter, nafFilters]);
+    },  [searchQuery, locationFilter, nafFilters, sizeFilters]);
 
     // Fonction pour construire l'URL de recherche
     const buildSearchUrl = useCallback(async (pageNumber: number=1) => {
@@ -182,9 +182,18 @@ export default function CompaniesPage() {
             params.append('section_activite_principale', nafSectionLetter.join(','));
         }
 
+        // Ajouter les filtres de taille si présents (plusieurs possibles)
+        if (sizeFilters.length > 0) {
+            // @ts-ignore
+            const sizeCodes = sizeFilters.map((section: SizeSection) => {
+                return section.id;
+            });
+            params.append('tranche_effectif_salarie', sizeCodes.join(','));
+        }
+
         console.log('param:', params.toString());
         return params.toString();
-    }, [searchQuery, locationFilter, nafFilters]);
+    }, [searchQuery, locationFilter, nafFilters, sizeFilters]);
 
     // Recherche des entreprises en temps réel
     useEffect(() => {
@@ -200,7 +209,7 @@ export default function CompaniesPage() {
             clearTimeout(timeout);
             abortController.abort();
         };
-    }, [searchQuery, locationFilter, nafFilters]); // Se déclenche quand la recherche ou les filtres changent
+    }, [searchQuery, locationFilter, nafFilters, sizeFilters]); // Se déclenche quand la recherche ou les filtres changent
 
     // 👇 DEUXIÈME useEffect : Scroll infini
     useEffect(() => {
@@ -309,7 +318,7 @@ export default function CompaniesPage() {
                         </div>
 
                         {/* Message si aucune recherche */}
-                        {searchQuery.trim().length < 3 && nafFilters.length == 0 && !locationFilter && (
+                        {searchQuery.trim().length < 3 && nafFilters.length == 0 && sizeFilters.length == 0 && !locationFilter && (
                             <div className="py-16 text-center">
                                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                                     <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

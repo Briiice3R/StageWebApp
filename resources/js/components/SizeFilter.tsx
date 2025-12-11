@@ -59,7 +59,7 @@ export default function SizeFilter({ onSectionsChange, error }: SizeFilterProps)
     return (
         <Field className="w-full">
             <Label className="mb-2 block text-sm font-medium text-gray-700">
-                Secteurs d'activité (Taille)
+                Taille (en salariés)
             </Label>
 
             <Popover className="relative">
