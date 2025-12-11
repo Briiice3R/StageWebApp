@@ -18,9 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+        $middleware->alias([
+            'role' => \App\Http\Middleware\CheckRole::class,
+        ]);
         $middleware->api(remove: [
             \Illuminate\Session\Middleware\StartSession::class,
         ]);
+        $middleware->redirectGuestsTo(fn ($request) => route('auth.index'));
     })
 
     ->withExceptions(function (Exceptions $exceptions) {

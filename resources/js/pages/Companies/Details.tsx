@@ -5,6 +5,8 @@ import nafData from '@/data/naf.json';
 import { NafActivity } from '@/types';
 import { useEffect, useState } from 'react';
 import locationHandler from '@/utils/locationHandler';
+import Navbar from '@/components/Navbar';
+import useAuth from '@/hooks/useAuth';
 
 export default function DetailCompaniesPage({ company:initialCompany }: { company: Company }) {
     const [company, setCompany] = useState(initialCompany);
@@ -49,12 +51,16 @@ export default function DetailCompaniesPage({ company:initialCompany }: { compan
     // Vérifier si c'est un établissement ou un siège
     const isEtablissement = company.siege?.isEtablissement === true;
     console.log(company);
-
+    const {isAdmin} = useAuth();
     return (
         <>
             <Head title="Informations sur l'entreprise" />
             <main className="flex min-h-screen bg-gray-50 p-8">
-                <AdminDashboardSidebar />
+                {isAdmin ? (
+                    <AdminDashboardSidebar />
+                ) : (
+                    <Navbar/>
+                )}
 
                 <div className="mx-auto w-full max-w-7xl rounded-lg bg-white p-8 shadow-md">
                     {/* Header */}
