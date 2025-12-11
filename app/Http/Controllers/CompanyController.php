@@ -31,26 +31,4 @@ class CompanyController extends Controller
         ]);
     }
 
-    /**
-     * Display companies that have internships (for students).
-     */
-    public function studentIndex(){
-        // Récupérer tous les SIRET uniques des entreprises qui ont des stages
-        $companySirets = Internship::distinct()->pluck('company_siret');
-
-        // Enrichir avec les données des entreprises
-        $companies = [];
-        foreach($companySirets as $siret){
-            $company = $this->companyService->getBySiret($siret);
-            if($company){
-                $company['internships_count'] = Internship::where('company_siret', $siret)->count();
-                $companies[] = $company;
-            }
-        }
-
-        return Inertia::render("StudentCompanies/Index", [
-            'companies' => $companies,
-        ]);
-    }
-
 }

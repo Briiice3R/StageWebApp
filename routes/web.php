@@ -5,13 +5,16 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\DetailCompanyController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 
-    // --- ZONE PUBLIQUE ---
-    // On isole la route index ici pour qu'elle soit accessible sans connexion
+// --- ZONE PUBLIQUE ---
+// Page d'accueil accessible sans connexion
+Route::get('/', function () {
+    return Inertia::render('Welcome');
+})->name('welcome');
 
 
 Route::prefix("admin")->name("admin.")->group(function(){
@@ -73,14 +76,3 @@ Route::middleware('auth')->post('/logout', [AuthController::class, 'destroy'])->
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Route::prefix("student")->name("student.")->group(function(){
-    Route::get("/", function(){
-        return \Inertia\Inertia::render("StudentHome/Index");
-    })->name("home");
-
-    Route::prefix("companies")->name("companies.")->group(function(){
-        Route::controller(CompanyController::class)->group(function(){
-            Route::get("/", "studentIndex")->name("index");
-        });
-    });
-});

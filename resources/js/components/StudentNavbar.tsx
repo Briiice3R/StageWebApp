@@ -3,7 +3,10 @@ import { Link, usePage } from '@inertiajs/react';
 export default function StudentNavbar() {
     const { url } = usePage();
 
-    const isActivePage = (path: string) => {
+    const isActivePage = (path: string, exact = false) => {
+        if (exact) {
+            return url === path;
+        }
         return url.startsWith(path);
     };
 
@@ -33,9 +36,9 @@ export default function StudentNavbar() {
                     {/* Navigation */}
                     <div className="flex items-center gap-4">
                         <Link
-                            href="/student"
+                            href="/home"
                             className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                                isActivePage('/student') && url === '/student'
+                                isActivePage('/home', true)
                                     ? 'bg-blue-600 text-white'
                                     : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
                             }`}
@@ -44,25 +47,25 @@ export default function StudentNavbar() {
                         </Link>
 
                         <Link
-                            href="/student/companies"
+                            href="/companies"
                             className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                                isActivePage('/student/companies')
+                                isActivePage('/companies')
                                     ? 'bg-blue-600 text-white'
                                     : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
                             }`}
                         >
-                            Entreprises partenaires
+                            Entreprises
                         </Link>
 
                         <Link
-                            href="/companies"
+                            href="/internships"
                             className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                                isActivePage('/companies') && !isActivePage('/student/companies')
+                                isActivePage('/internships')
                                     ? 'bg-blue-600 text-white'
                                     : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
                             }`}
                         >
-                            Rechercher
+                            Stages
                         </Link>
                     </div>
                 </div>
