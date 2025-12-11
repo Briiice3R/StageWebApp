@@ -96,7 +96,7 @@ export default function SizeFilter({ onSectionsChange, error }: SizeFilterProps)
                             <div className="border-b border-gray-200 bg-gray-50 px-4 py-3">
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm font-medium text-gray-700">
-                                        Sélectionnez les secteurs
+                                        Sélectionnez les tailles
                                     </span>
                                     <div className="flex gap-2">
                                         <button

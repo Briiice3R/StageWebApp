@@ -254,7 +254,7 @@ export default function CompaniesPage() {
 
                     {/* Section de recherche et filtres sur la même ligne */}
                     <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                             {/* Recherche d'entreprise */}
                             <Field className="w-full">
                                 <Label className="mb-2 block text-sm font-medium text-gray-700">
@@ -357,6 +357,7 @@ export default function CompaniesPage() {
                                             onClick={() => {
                                                 setLocationFilter(null);
                                                 setNafFilters([]);
+                                                setSizeFilters([]);
                                             }}
                                             className="text-sm text-blue-600 underline hover:text-blue-800"
                                         >
