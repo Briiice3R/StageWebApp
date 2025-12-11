@@ -30,4 +30,5 @@ class CompanyController extends Controller
             'company' => $company,
         ]);
     }
+
 }

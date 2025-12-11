@@ -38,6 +38,19 @@ class StudentController extends Controller
     }
 
     /**
+     * Display the internships of a specific student.
+     */
+    public function internships(string $student_id)
+    {
+        $student = Student::with('internships')->findOrFail($student_id);
+
+        return Inertia::render("Students/Internships/Index", [
+            "student" => $student->toArray(),
+            "internships" => $student->internships->toArray()
+        ]);
+    }
+
+    /**
      * Display the specified resource.
      */
     public function show(string $id)

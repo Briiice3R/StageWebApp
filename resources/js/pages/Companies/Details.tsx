@@ -5,8 +5,8 @@ import nafData from '@/data/naf.json';
 import { NafActivity } from '@/types';
 import { useEffect, useState } from 'react';
 import locationHandler from '@/utils/locationHandler';
-import Navbar from '@/components/Navbar';
 import useAuth from '@/hooks/useAuth';
+import StudentNavbar from '@/components/StudentNavbar';
 
 export default function DetailCompaniesPage({ company:initialCompany }: { company: Company }) {
     const [company, setCompany] = useState(initialCompany);
@@ -55,14 +55,13 @@ export default function DetailCompaniesPage({ company:initialCompany }: { compan
     return (
         <>
             <Head title="Informations sur l'entreprise" />
-            <main className="flex min-h-screen bg-gray-50 p-8">
-                {isAdmin ? (
-                    <AdminDashboardSidebar />
-                ) : (
-                    <Navbar/>
-                )}
 
-                <div className="mx-auto w-full max-w-7xl rounded-lg bg-white p-8 shadow-md">
+            {!isAdmin && <StudentNavbar />}
+
+            <main className={`min-h-screen bg-gray-50 ${isAdmin ? 'flex p-8' : ''}`}>
+                {isAdmin && <AdminDashboardSidebar />}
+
+                <div className={`${isAdmin ? 'mx-auto w-full max-w-7xl' : 'mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'} rounded-lg bg-white p-8 shadow-md`}>
                     {/* Header */}
                     <div className="mb-8 flex items-center gap-3 border-b border-gray-200 pb-4">
                         <svg

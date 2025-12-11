@@ -5,13 +5,16 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\DetailCompanyController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 
-    // --- ZONE PUBLIQUE ---
-    // On isole la route index ici pour qu'elle soit accessible sans connexion
+// --- ZONE PUBLIQUE ---
+// Page d'accueil accessible sans connexion
+Route::get('/', function () {
+    return Inertia::render('Welcome');
+})->name('welcome');
 
 
 Route::prefix("admin")->name("admin.")->group(function(){
@@ -25,6 +28,7 @@ Route::prefix("admin")->name("admin.")->group(function(){
             Route::controller(InternshipController::class)->group(function(){
                 Route::get("/create", "create")->name("create");
                 Route::post("/", "store")->name("store");
+                Route::get("/", "index")->name("index");
             });
         });
 
@@ -32,6 +36,8 @@ Route::prefix("admin")->name("admin.")->group(function(){
         Route::prefix("students")->name("students.")->group(function(){
             Route::controller(StudentController::class)->group(function(){
                 Route::get("/", "index")->name("index");
+                Route::get("/{student_id}/internships", "internships")->name("internships");
+           });
             });
         });
 
@@ -43,8 +49,6 @@ Route::prefix("admin")->name("admin.")->group(function(){
                 Route::post("/", "store")->name("store");
             });
         });
-
-    });
 });
 
 Route::middleware(['auth'])->group(function() {
@@ -71,3 +75,4 @@ Route::middleware('auth')->post('/logout', [AuthController::class, 'destroy'])->
 
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+
