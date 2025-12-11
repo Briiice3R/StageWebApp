@@ -1,15 +1,14 @@
 import AdminDashboardSidebar from '@/components/AdminDashboardSidebar';
-import StudentNavbar from '@/components/StudentNavbar';
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Company } from '@/types/model';
 import nafData from '@/data/naf.json';
 import { NafActivity } from '@/types';
 import { useEffect, useState } from 'react';
 import locationHandler from '@/utils/locationHandler';
+import useAuth from '@/hooks/useAuth';
+import StudentNavbar from '@/components/StudentNavbar';
 
 export default function DetailCompaniesPage({ company:initialCompany }: { company: Company }) {
-    const { url } = usePage();
-    const isAdmin = url.startsWith('/admin');
     const [company, setCompany] = useState(initialCompany);
     const getNafLabel = (nafId: string): string=>{
         const section = (nafData as NafActivity[]).find(
@@ -52,7 +51,7 @@ export default function DetailCompaniesPage({ company:initialCompany }: { compan
     // Vérifier si c'est un établissement ou un siège
     const isEtablissement = company.siege?.isEtablissement === true;
     console.log(company);
-
+    const {isAdmin} = useAuth();
     return (
         <>
             <Head title="Informations sur l'entreprise" />

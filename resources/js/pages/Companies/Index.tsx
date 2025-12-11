@@ -8,6 +8,9 @@ import { Field, Label } from '@headlessui/react';
 import { Head } from '@inertiajs/react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import CompanyCard from '@/components/CompanyCard';
+import AdminDashboardSidebar from '@/components/AdminDashboardSidebar';
+import Navbar from '@/components/Navbar';
+import useAuth from '@/hooks/useAuth';
 
 
 
@@ -227,158 +230,190 @@ export default function CompaniesPage() {
         setCompanies([]);
         setCompaniesError('');
     };
-
+    const {isAdmin} = useAuth();
     return (
         <>
             <Head title="Recherche d'entreprises" />
-            <main className="min-h-screen bg-gray-50 p-8">
-                <div className="mx-auto max-w-7xl">
-                    {/* Header */}
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900">Recherche d'entreprises</h1>
-                        <p className="mt-2 text-sm text-gray-600">Trouvez des entreprises par nom, localisation ou secteur d'activité</p>
-                    </div>
 
-                    {/* Section de recherche et filtres sur la même ligne */}
-                    <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                            {/* Recherche d'entreprise */}
-                            <Field className="w-full">
-                                <Label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Nom de l'entreprise ou SIRET <span className="text-red-500">*</span>
-                                </Label>
-                                <div className="relative">
-                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* Navbar */}
+            {!isAdmin && <Navbar />}
+
+            <div className={`min-h-screen bg-gray-50 ${isAdmin ? 'flex p-8' : ''}`}>
+                {isAdmin && <AdminDashboardSidebar />}
+                <main className={`${isAdmin ? 'flex-1 p-8' : 'p-8'}`}>
+                    <div className="mx-auto max-w-7xl">
+                        {/* Header avec icône */}
+                        <div className="mb-8 flex items-center gap-3">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                                stroke="currentColor"
+                                className="h-10 w-10 text-blue-600"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"
+                                />
+                            </svg>
+                            <div>
+                                <h1 className="text-3xl font-bold text-gray-900">Recherche d'entreprises</h1>
+                                <p className="mt-1 text-sm text-gray-600">
+                                    Trouvez des entreprises par nom, localisation ou secteur d'activité
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Section de recherche et filtres */}
+                        <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                                {/* Recherche d'entreprise */}
+                                <Field className="w-full">
+                                    <Label className="mb-2 block text-sm font-medium text-gray-700">
+                                        Nom de l'entreprise ou SIRET <span className="text-red-500">*</span>
+                                    </Label>
+                                    <div className="relative">
+                                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                                />
+                                            </svg>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full rounded-md border border-gray-300 bg-white py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Nom d'entreprise ou SIRET..."
+                                        />
+                                    </div>
+                                    <p className="mt-1 text-xs text-gray-500">Min. 3 caractères</p>
+                                </Field>
+
+                                {/* Filtre de localisation */}
+                                <LocationSearchBar onLocationSelect={setLocationFilter} />
+
+                                {/* Filtre NAF */}
+                                <NafActivityFilter onSectionsChange={setNafFilters} />
+                            </div>
+                        </div>
+
+                        {/* Section des résultats */}
+                        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                            <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-4">
+                                <h2 className="text-xl font-semibold text-gray-900">Résultats {companies.length > 0 && `(${companies.length})`}</h2>
+                                {isLoadingCompanies && (
+                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                        <svg
+                                            className="h-4 w-4 animate-spin text-blue-500"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                            ></path>
+                                        </svg>
+                                        Recherche en cours...
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Message si aucune recherche */}
+                            {searchQuery.trim().length < 3 && nafFilters.length == 0 && !locationFilter && (
+                                <div className="py-16 text-center">
+                                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+                                        <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
-                                                strokeWidth={2}
+                                                strokeWidth={1.5}
                                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                                             />
                                         </svg>
                                     </div>
-                                    <input
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full rounded-md border border-gray-300 bg-white py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Nom d'entreprise ou SIRET..."
-                                    />
+                                    <h3 className="text-lg font-medium text-gray-900">Commencez votre recherche</h3>
+                                    <p className="mt-2 text-sm text-gray-500">
+                                        Entrez le nom d'une entreprise ou un numéro SIRET dans le champ de recherche
+                                    </p>
                                 </div>
-                                <p className="mt-1 text-xs text-gray-500">Min. 3 caractères</p>
-                            </Field>
+                            )}
 
-                            {/* Filtre de localisation */}
-                            <LocationSearchBar onLocationSelect={setLocationFilter} />
+                            {/* Message d'erreur */}
+                            {companiesError && searchQuery.trim() && (
+                                <div className="py-16 text-center">
+                                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+                                        <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <p className="text-sm text-gray-600">{companiesError}</p>
+                                    {(locationFilter || nafFilters.length > 0) && (
+                                        <div className="mt-4">
+                                            <button
+                                                onClick={() => {
+                                                    setLocationFilter(null);
+                                                    setNafFilters([]);
+                                                }}
+                                                className="text-sm text-blue-600 underline hover:text-blue-800"
+                                            >
+                                                Essayez de retirer tous les filtres
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
-                            {/* Filtre NAF */}
-                            <NafActivityFilter onSectionsChange={setNafFilters} />
-                        </div>
-                    </div>
+                            {/* Liste des entreprises */}
+                            {!isLoadingCompanies && companies.length > 0 && (
+                                <div className="space-y-6">
+                                    {companies.map((company: Company) => (
+                                        <CompanyCard company={company} key={company.siege.siret}/>
+                                    ))}
 
-                    {/* Section des résultats */}
-                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                        <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-4">
-                            <h2 className="text-xl font-semibold text-gray-900">Résultats {companies.length > 0 && `(${companies.length})`}</h2>
-                            {isLoadingCompanies && (
-                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                    <svg
-                                        className="h-4 w-4 animate-spin text-blue-500"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        ></path>
-                                    </svg>
-                                    Recherche en cours...
+                                    {isLoadingMore && (
+                                        <div className="flex justify-center py-8">
+                                            <svg className="h-8 w-8 animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            <span className="ml-2 text-gray-600">Chargement de plus de résultats...</span>
+                                        </div>
+                                    )}
+
+
+                                    {!hasMore && !isLoadingMore && (
+                                        <p className="py-8 text-center text-sm text-gray-500">
+                                            ✓ Tous les résultats ont été chargés
+                                        </p>
+                                    )}
                                 </div>
                             )}
                         </div>
-
-                        {/* Message si aucune recherche */}
-                        {searchQuery.trim().length < 3 && nafFilters.length == 0 && !locationFilter && (
-                            <div className="py-16 text-center">
-                                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                                    <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={1.5}
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                        />
-                                    </svg>
-                                </div>
-                                <h3 className="text-lg font-medium text-gray-900">Commencez votre recherche</h3>
-                                <p className="mt-2 text-sm text-gray-500">
-                                    Entrez le nom d'une entreprise ou un numéro SIRET dans le champ de recherche
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Message d'erreur */}
-                        {companiesError && searchQuery.trim() && (
-                            <div className="py-16 text-center">
-                                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                                    <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                        />
-                                    </svg>
-                                </div>
-                                <p className="text-sm text-gray-600">{companiesError}</p>
-                                {(locationFilter || nafFilters.length > 0) && (
-                                    <div className="mt-4">
-                                        <button
-                                            onClick={() => {
-                                                setLocationFilter(null);
-                                                setNafFilters([]);
-                                            }}
-                                            className="text-sm text-blue-600 underline hover:text-blue-800"
-                                        >
-                                            Essayez de retirer tous les filtres
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Liste des entreprises */}
-                        {!isLoadingCompanies && companies.length > 0 && (
-                            <div className="space-y-6">
-                                {companies.map((company: Company) => (
-                                    <CompanyCard company={company} key={company.siege.siret}/>
-                                ))}
-
-                                {isLoadingMore && (
-                                    <div className="flex justify-center py-8">
-                                        <svg className="h-8 w-8 animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        <span className="ml-2 text-gray-600">Chargement de plus de résultats...</span>
-                                    </div>
-                                )}
-
-
-                                {!hasMore && !isLoadingMore && (
-                                    <p className="py-8 text-center text-sm text-gray-500">
-                                        ✓ Tous les résultats ont été chargés
-                                    </p>
-                                )}
-                            </div>
-                        )}
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </>
     );
 }
+
+
+{/* Section de recherche et filtres sur la même ligne */}
+
+
+{/* Section des résultats */}
+
